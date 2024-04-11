@@ -5,5 +5,5 @@ router = APIRouter(
     prefix="/api/v1",
 )
 @router.get("/ping", tags=["Test the server"])
-def ping() -> TestModel:
+async def ping() -> TestModel:
     return {"message": "pong"}

@@ -1,11 +1,11 @@
 from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
-from fastapi_utilities import repeat_every
+from apscheduler.schedulers.background import BackgroundScheduler
 from contextlib import asynccontextmanager
+from automatisation.auto_get_reservations import fetch_reservations
 from dotenv import load_dotenv
 import uvicorn
-import asyncio
 
 load_dotenv()
 
@@ -13,32 +13,22 @@ from routers import test
 
 origins = []
 
+scheduler = BackgroundScheduler()
 
-# @asynccontextmanager
-# async def lifespan(app: FastAPI):
-#     print("Starting application")
-#     background_task = asyncio.create_task( periodic_background_task() )
-#     try:
-#         yield
-#     finally:
-#         background_task.cancel()
-#         try:
-#             await background_task
-#         except asyncio.CancelledError:
-#             print("Background task was cancelled")
+# This is the context manager that will start and stop the scheduler
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    scheduler.add_job(fetch_reservations, "interval", seconds=5)
+    scheduler.start()
+    print("Scheduler started")
+    try:
+        yield
+    finally:
+        scheduler.shutdown()
+        print("Scheduler stopped")
 
-# async def periodic_background_task( secounds: int = 10 ):
-#     try:
-#         while True:
-#             # Replace the print statement with the actual task you want to perform
-#             print("Background task is running")
-#             await asyncio.sleep( secounds )
-#     except asyncio.CancelledError:
-#         print("Periodic task was cancelled")
-#     except Exception as e:
-#         print(f"An error occurred in the background task: {e}")
-# app = FastAPI( lifespan=lifespan)
-app = FastAPI()
+
+app = FastAPI( lifespan=lifespan)
 
 app.include_router(test.router)
 
