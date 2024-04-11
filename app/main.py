@@ -5,6 +5,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from contextlib import asynccontextmanager
 from automatisation.auto_get_reservations import fetch_reservations
 from dotenv import load_dotenv
+import os
 import uvicorn
 
 load_dotenv()
@@ -18,14 +19,17 @@ scheduler = BackgroundScheduler()
 # This is the context manager that will start and stop the scheduler
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    scheduler.add_job(fetch_reservations, "interval", seconds=5)
-    scheduler.start()
-    print("Scheduler started")
-    try:
+    if os.getenv("AUTO_FETCH_RESERVATIONS") == "True":
+        scheduler.add_job(fetch_reservations, "interval", seconds=5)
+        scheduler.start()
+        print("Scheduler started")
+        try:
+            yield
+        finally:
+            scheduler.shutdown()
+            print("Scheduler stopped")
+    else:
         yield
-    finally:
-        scheduler.shutdown()
-        print("Scheduler stopped")
 
 
 app = FastAPI( lifespan=lifespan)
