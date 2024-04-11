@@ -24,8 +24,9 @@ app.add_middleware(
 @app.get("/", status_code=status.HTTP_200_OK, tags=["API Check"])
 def check():
     return {
-        "message": "Hello World!"
+        "message": test.get_building()
     }
 
 if __name__ == '__main__':
+    print("JEL")
     uvicorn.run(app)
