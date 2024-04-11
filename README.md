@@ -13,4 +13,5 @@ pip install -r requirements.txt
 3. Run the server
 ```bash
 python app/main.py
+python -m uvicorn --app-dir="./app" --reload main:app 
 ```

@@ -5,13 +5,13 @@ import uvicorn
 
 load_dotenv()
 
-from routers import test
+from app.routers import routes
 
 origins = []
 
 app = FastAPI()
 
-app.include_router(test.router)
+app.include_router(routes.router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -29,3 +29,4 @@ def check():
 
 if __name__ == '__main__':
     uvicorn.run(app)
+    
