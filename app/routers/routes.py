@@ -30,7 +30,7 @@ def search_db(search_input, room_size : str = Query(""), building : str = Query(
     return search_filter(search_input, list_of_filters)
     
 
-@router.get("/room/{room_name}/reservation", tags=["Get reservation"])
+@router.get("/room/reservation/{room_name}", tags=["Get reservation"])
 def get_reservation(room_name: str):
-    return {room_name: show_room_reservations(room_name)}
+    return show_room_reservations(room_name)
 
