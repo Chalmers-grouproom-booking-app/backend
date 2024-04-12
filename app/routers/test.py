@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from models.test_model import TestModel
-import database.building as building
+from database.rooms import get_room_building
 
 router = APIRouter(
     prefix="/api/v1",
@@ -9,6 +9,6 @@ router = APIRouter(
 def ping() -> TestModel:
     return {"message": "pong"}
 
-@router.get("/building", tags=["BUILDING"])
-def get_building() -> TestModel:
-    return {"message": building.get_building("Vasa")}
+@router.get("/room/building/{room_name}", tags=["Get building"])
+def get_building(room_name: str):
+    return {"building": get_room_building(room_name)}

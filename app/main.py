@@ -24,7 +24,7 @@ app.add_middleware(
 @app.get("/", status_code=status.HTTP_200_OK, tags=["API Check"])
 def check():
     return {
-        "message": test.get_building()
+        "message": "Hello World!"
     }
 
 if __name__ == '__main__':

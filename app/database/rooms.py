@@ -6,3 +6,10 @@ def get_room_info(room_name):
         1, 1,  {'filter': filter}
     )
     return room_record
+
+def get_room_building(room: str) -> str:
+    filter = f"room_name = {room}"
+    room_record = client.collection('grouprooms').get_list(
+        1, 1,  {'filter': filter}
+    )
+    return room_record.items[0].building

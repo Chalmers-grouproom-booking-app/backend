@@ -18,3 +18,4 @@ def ping() -> TestModel:
 @router.get("/room/{room_name}", tags=["Get room info"])
 def get_room_info_route(room_name: str):
     return get_room_info(room_name)
+
