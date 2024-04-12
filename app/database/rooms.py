@@ -39,12 +39,10 @@ def show_room_reservations(room_name: str):
     room_record = client.collection('grouprooms').get_list(1, 1, {'filter': filter})
     room = room_record.items[0].id
     new_filter = f"room.room_name={room_name}"
-    #reservations_record = client.collection('reservations').get_list(1, 1, {filter: cool})
     try:
         reservation_record =  client.collection('reservations').get_list(1, 1, {'filter': new_filter})
     except:
         return "Very bad."
-
 
     reserved_times = {}
     for res in reservation_record.items:
