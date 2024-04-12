@@ -3,8 +3,8 @@ import json
 
 def get_room_info(room_name):
     try:
-        filter = f"room_name='{room_name}'"
-        room_record = client.collection('grouprooms').get_list(1, 1,  {'filter': filter})
+        thisfilter = f"room_name='{room_name}'"
+        room_record = client.collection('grouprooms').get_list(1, 1,  {'filter': thisfilter})
         room_info = {
                 "Room Name": room_name,
                 "Room Size": f"{get_room_size(room_record)} square meters",
