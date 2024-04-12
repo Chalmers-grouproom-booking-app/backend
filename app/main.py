@@ -28,5 +28,6 @@ def check():
     }
 
 if __name__ == '__main__':
+    print("JEL")
     uvicorn.run(app)
     

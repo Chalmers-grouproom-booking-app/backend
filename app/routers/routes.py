@@ -4,6 +4,7 @@ from models.test_model import TestModel
 from database.pb import client
 from database.rooms import get_room_info
 from database.filter import *
+from database.rooms import show_room_reservations
 
 router = APIRouter(
     prefix="/api/v1",
@@ -28,3 +29,8 @@ def search_db(search_input, room_size : str = Query(""), building : str = Query(
     list_of_filters = dict(zip(keys, list_of_filters))
     return search_filter(search_input, list_of_filters)
     
+
+@router.get("/room/reservation/{room_name}", tags=["Get reservation"])
+def get_reservation(room_name: str):
+    return show_room_reservations(room_name)
+
