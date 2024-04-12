@@ -52,28 +52,25 @@ def room_format(room_record):
     
 
 def get_room_building(room: str) -> str:
-    filter = f"room_name = {room}"
+    thisfilter = f"room_name = {room}"
     room_record = client.collection('grouprooms').get_list(
-        1, 1,  {'filter': filter}
+        1, 1,  {'filter': thisfilter}
     )
     return room_record.items[0].building
 
 def show_room_reservations(room_name: str):
-    filter = f"room_name = {room_name}"
-    room_record = client.collection('grouprooms').get_list(1, 1, {'filter': filter})
-    room = room_record.items[0].id
-    new_filter = f"room.room_name={room_name}"
-    #reservations_record = client.collection('reservations').get_list(1, 1, {filter: cool})
-    try:
-        reservation_record =  client.collection('reservations').get_list(1, 1, {'filter': new_filter})
-    except:
-        return "Very bad."
+    
+    new_filter = f"room.room_name='{room_name}'"
+    reservation_record =  client.collection('reservations').get_list(1, 10, {'filter': new_filter})
 
-
-    reserved_times = {}
+    reserved_times = []
     for res in reservation_record.items:
-        if(res.room == room):
-            reserved_times.update({"start-time": res.starttime})
-            reserved_times.update({"end-time": res.endtime})
-
+        reservation = {
+            "start-time": res.starttime,
+            "end-time": res.endtime
+        }
+        reserved_times.append(reservation)
+        
+    if len(reserved_times) == 0:
+        return ["No reservations found"]
     return reserved_times
