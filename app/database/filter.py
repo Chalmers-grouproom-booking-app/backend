@@ -1,7 +1,7 @@
 from database.pb import client
 from database.rooms import room_format
 
-UNWANTED_FIELDS = ['expand', 'collection_id', 'collection_name', 'id', 'room_id', 'created', 'updated']
+UNWANTED_FIELDS = ['expand', 'collection_id', 'collection_name', 'id', 'room_id', 'created', 'updated', 'longitude', 'latitude','entrance_longitude', 'entrance_latitude', 'description', 'stair']
 
 def get_fields(records):
     if records.items:
@@ -29,7 +29,6 @@ def search_filter(search_result, filter):
     for field in fields:
         if field not in UNWANTED_FIELDS:
             result = client.collection('grouprooms').get_list(query_params={'filter': f'{field}~"{search_result}"' + filter_result})
-            print(result)
             if result.items:
                 results.update({field : result.items})
             formatted_data = room_format(result)
