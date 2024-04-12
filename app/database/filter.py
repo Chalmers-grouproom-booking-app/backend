@@ -35,7 +35,6 @@ def search_filter(search_result, filter):
 def filter_results(filters):
     filter_parts = ""
     for field, value in filters.items():
-        if (field, value):
-            filter_parts += " && " + f'{field}~"{value}"'
+        filter_parts += " && " + f'{field}~"{value}"'
     print(filter_parts)
     return filter_parts
