@@ -10,7 +10,7 @@ import uvicorn
 
 load_dotenv()
 
-from routers import test
+from app.routers import routes
 
 origins = []
 
@@ -34,7 +34,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI( lifespan=lifespan)
 
-app.include_router(test.router)
+app.include_router(routes.router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -52,4 +52,6 @@ def check():
 
 
 if __name__ == '__main__':
+    print("JEL")
     uvicorn.run(app)
+    
