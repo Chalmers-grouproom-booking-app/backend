@@ -1,8 +1,6 @@
 from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
-from contextlib import asynccontextmanager
 from apscheduler.schedulers.background import BackgroundScheduler
-from contextlib import asynccontextmanager
 from automatisation.auto_get_reservations import fetch_reservations
 from dotenv import load_dotenv
 import os
@@ -16,23 +14,8 @@ origins = []
 
 scheduler = BackgroundScheduler()
 
-# This is the context manager that will start and stop the scheduler
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    if os.getenv("AUTO_FETCH_RESERVATIONS") == "True":
-        scheduler.add_job(fetch_reservations, "interval", seconds=5)
-        scheduler.start()
-        print("Scheduler started")
-        try:
-            yield
-        finally:
-            scheduler.shutdown()
-            print("Scheduler stopped")
-    else:
-        yield
 
-
-app = FastAPI( lifespan=lifespan)
+app = FastAPI()
 
 app.include_router(routes.router)
 
@@ -46,12 +29,18 @@ app.add_middleware(
 
 @app.get("/", status_code=status.HTTP_200_OK, tags=["API Check"])
 def check():
-    print("Welcome, to the server")
     return {
         "message": "Hello World!"
     }
 
 
 if __name__ == '__main__':
-    uvicorn.run(app, host="0.0.0.0", port=15029)
-    
+    if os.getenv("AUTO_FETCH_RESERVATIONS") == "True":
+        scheduler.add_job(fetch_reservations, "interval", seconds=60*10)
+        scheduler.start()
+        print("Scheduler started to fetch reservations every 10 minutes")
+        uvicorn.run(app, host="0.0.0.0", port=15029)
+        print("Scheduler stopped")
+        scheduler.shutdown()
+    else:
+        uvicorn.run(app, host="0.0.0.0", port=15029)
