@@ -53,6 +53,5 @@ def check():
 
 
 if __name__ == '__main__':
-    print("JEL")
-    uvicorn.run(app)
+    uvicorn.run(app, host="0.0.0.0", port=15029)
     
