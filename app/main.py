@@ -10,7 +10,7 @@ import uvicorn
 
 load_dotenv()
 
-from app.routers import routes
+from routers import routes
 
 origins = []
 
