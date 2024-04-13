@@ -46,6 +46,7 @@ app.add_middleware(
 
 @app.get("/", status_code=status.HTTP_200_OK, tags=["API Check"])
 def check():
+    print("Welcome, to the server")
     return {
         "message": "Hello World!"
     }
