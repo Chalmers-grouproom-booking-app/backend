@@ -1,10 +1,9 @@
 import os
 import requests
-from typing import Union
-from datetime import datetime
+from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
-from scramble import TimeEditScramble
+from automatisation.scramble import TimeEditScramble
 
 class TimeEditAPI:
     # Global variables
@@ -70,7 +69,7 @@ class TimeEditAPI:
             raise Exception("❌ Login failed with CID")
 
     # pass the args to as_url
-    def get_reservations(self, from_date: Union[str, datetime] = None, to_date: Union[str, datetime] = None) -> dict:
+    def get_reservations(self, from_date: datetime = None, to_date: datetime = None) -> dict:
         reservations_url = self.scramble.as_url( from_date=from_date, to_date=to_date)
         response = self.session.get(reservations_url)
         try:
@@ -88,4 +87,4 @@ class TimeEditAPI:
 
 if __name__ == "__main__":
     timeedit = TimeEditAPI()
-    print(timeedit.get_reservations( "20240412", "20240412"))
+    print(timeedit.get_reservations(  from_date=datetime.now(), to_date=datetime.now() + timedelta(days=7)))
