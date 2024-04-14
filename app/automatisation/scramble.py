@@ -1,5 +1,4 @@
 import urllib.parse
-from typing import Union
 from datetime import datetime
 
 # Magic scramble class for TimeEdit
@@ -115,22 +114,24 @@ class TimeEditScramble:
         self.key_values[3] += f"{object_id},"
     def edit_all_objects(self, object_ids: list):
         self.key_values[3] = "objects=" + ",".join(object_ids) + ","
-    def as_url(self, from_date: Union[str, datetime] = None, to_date: Union[str, datetime] = None):
+    def as_url(self, from_date: datetime = None, to_date: datetime = None):
         # Convert string to datetime, example: "20240411" -> datetime(2024, 4, 11)
-        if isinstance(from_date, str):
-            from_date = datetime.strptime(from_date, "%Y%m%d")
-        if isinstance(to_date, str):
-            to_date = datetime.strptime(to_date, "%Y%m%d")
-        if (from_date is not None and to_date is not None and from_date > to_date):
-            self.key_values[2] = f"p={from_date.strftime('%Y%m%d')}-{to_date.strftime('%Y%m%d')}"
-        elif (from_date is not None):
-            self.key_values[2] = f"p={from_date.strftime('%Y%m%d')}-{from_date.strftime('%Y%m%d')}"
-        elif (to_date is not None):
-            self.key_values[2] = f"p={to_date.strftime('%Y%m%d')}-{to_date.strftime('%Y%m%d')}"
-        else:
-            # Todays date
-            self.key_values[2] = f"p={datetime.now().strftime('%Y%m%d')}-{datetime.now().strftime('%Y%m%d')}"
+        if from_date is None and to_date is None:
+            today = datetime.now().strftime('%Y%m%d')
+            date_range = f"p={today}-{today}"
+        elif from_date and to_date:
+            # Check if from_date is greater than to_date
+            if from_date > to_date:
+                raise ValueError("The from_date cannot be later than the to_date.")
+            date_range = f"p={from_date.strftime('%Y%m%d')}-{to_date.strftime('%Y%m%d')}"
+        elif from_date:
+            # Only from_date is provided, use the same date for to_date
+            date_range = f"p={from_date.strftime('%Y%m%d')}-{from_date.strftime('%Y%m%d')}"
+        else:  # Only to_date is provided
+            date_range = f"p={to_date.strftime('%Y%m%d')}-{to_date.strftime('%Y%m%d')}"
 
+        # Set the URL parameter
+        self.key_values[2] = date_range
         url = self.urls[0]
         key_values = [str(k).replace('+', ' ') for k in self.key_values]
         last_slash = str(url).rfind("/")
