@@ -3,3 +3,4 @@ python-dotenv==0.15.0
 uvicorn==0.13.
 pocketbase
 apscheduler
+requests
