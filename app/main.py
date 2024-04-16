@@ -1,6 +1,7 @@
-from fastapi import FastAPI, status
+from fastapi import FastAPI, status,Request 
 from fastapi.middleware.cors import CORSMiddleware
 from apscheduler.schedulers.background import BackgroundScheduler
+from fastapi.responses import JSONResponse
 from automatisation.auto_get_reservations import fetch_reservations
 from dotenv import load_dotenv
 import os
@@ -27,12 +28,24 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/", status_code=status.HTTP_200_OK, tags=["API Check"])
+@app.get("/ping", status_code=status.HTTP_200_OK, tags=["API Check"], summary="Check if the API is up")
 def check():
-    return {
-        "message": "Hello World!"
-    }
+    return {"message": "pong"}
 
+
+@app.exception_handler(Exception)
+async def general_exception_handler(request: Request, exc: Exception):
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={"detail": f"Internal server error: {str(exc)}"}
+    )
+
+@app.exception_handler(ValueError)
+async def value_error_handler(request: Request, exc: ValueError):
+    return JSONResponse(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        content={"detail": str(exc)}
+    )
 
 if __name__ == '__main__':
     if os.getenv("AUTO_FETCH_RESERVATIONS") == "True":

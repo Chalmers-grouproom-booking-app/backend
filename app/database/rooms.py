@@ -1,76 +1,55 @@
-from database.pb import client
-import json
+from typing import List
+from models.response import ReservationModel, RoomModel, SearchModel
+from database.queries import RoomQuery
 
-def get_room_info(room_name):
-    # try:
-    thisfilter = f"room_name='{room_name}'"
-    room_record = client.collection('grouprooms').get_list(1, 1,  {'filter': thisfilter})
-    return room_format(room_record)
-    
-def room_format(room_record):
+def get_room_info(room_name) -> RoomModel:
+    return convert_room_to_dict( RoomQuery(room_name).get_room() )
+
+def get_all_rooms():
+    all_rooms = RoomQuery.get_all_rooms()
+    return format_all_rooms(  all_rooms )
+
+def format_all_rooms( room_records: list ) -> list[RoomModel]:
+    return [ convert_room_to_dict(room) for room in room_records ]
+
+def convert_room_to_dict( room ) -> RoomModel:
+    return {
+        "room_name": room.room_name,
+        "room_size": room.room_size if (room.room_size != None) else "",
+        "building": room.building,
+        "campus": room.campus,
+        "equipment": room.equipment if (room.equipment != None) else "",
+        "longitude": room.longitude,
+        "latitude": room.latitude,
+        "entrance_latitude": room.entrance_latitude,
+        "entrance_longitude": room.entrance_longitude,
+        "description": room.description,
+        "first_come_first_served": room.first_come_first_served,
+        "floor_level": room.floor_level if (room.floor_level != None) else "",
+        "stair": room.stair if (room.stair != None) else "",
+    }
+
+def room_format(room_record: dict) -> SearchModel:
+    fields = {}
     rooms = []
-    for item in room_record.items:
-        
-        room = {
-            "Room Name": item.room_name,
-            "Room Size": item.room_size,
-            "Building": item.building,
-            "Campus": item.campus,
-            "Equipment": item.equipment,
-            "Longitude": item.longitude,
-            "Latitude": item.latitude,
-            "Entrance latitude": item.entrance_latitude,
-            "Entrance longitude": item.entrance_longitude,
-            "Description": item.description,
-            "First come first served": item.first_come_first_served,
-            "Floor Level": item.floor_level,
-            "stair": item.stair
-        }
-        
-        equipment = room.get("Equipment", "")
-        room_size = room.get("Room Size", "")
-        floor_level = room.get("Floor Level", "")
-        stair = room.get("stair", "")
-            
-        rooms.append({
-            "Room Name": item.room_name,
-            "Room Size": room_size ,
-            "Building": item.building,
-            "Campus": item.campus,
-            "Equipment": equipment,
-            "Longitude": item.longitude,
-            "Latitude": item.latitude,
-            "Entrance Latitude": item.entrance_latitude,
-            "Entrance Longitude": item.entrance_longitude,
-            "Description": item.description,
-            "First Come First Served": item.first_come_first_served,
-            "Floor Level": floor_level,
-            "Stairs": stair
-        })
-
-    return rooms
+    keys = room_record.keys()
+    for key in keys:
+        fields[key] = room_record[key]
+        for item in room_record[key]:  
+            room = convert_room_to_dict(item)
+            rooms.append(room) 
+        fields[key] = rooms
+        rooms = []
+    return fields
     
 
-def get_room_building(room: str) -> str:
-    thisfilter = f"room_name = {room}"
-    room_record = client.collection('grouprooms').get_list(
-        1, 1,  {'filter': thisfilter}
-    )
-    return room_record.items[0].building
-
-def show_room_reservations(room_name: str):
-    
-    new_filter = f"room.room_name='{room_name}'"
-    reservation_record =  client.collection('reservations').get_list(1, 50, {'filter': new_filter})
-
+def show_room_reservations(room_name: str) -> List[ReservationModel]:
+    reservations = RoomQuery(room_name).get_reservations()
     reserved_times = []
-    for res in reservation_record.items:
+    for res in reservations:
         reservation = {
-            "start-time": res.starttime,
-            "end-time": res.endtime
+            "start_time": res.starttime,
+            "end_time": res.endtime
         }
-        reserved_times.append(reservation)
-        
-    if len(reserved_times) == 0:
-        return [{"No reservations found"}]
+        reserved_times.append(ReservationModel(**reservation))        
     return reserved_times

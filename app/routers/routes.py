@@ -1,36 +1,52 @@
-from typing import Optional
-from fastapi import APIRouter, Query
-from models.test_model import TestModel
-from database.pb import client
-from database.rooms import get_room_info
-from database.filter import *
-from database.rooms import show_room_reservations
+from fastapi import APIRouter, Query, HTTPException, status, Path, Response
+from typing import List, Optional
+from app.database.filter import search_filter
+from app.database.rooms import get_all_rooms, get_room_info, show_room_reservations
+from app.models.response import ReservationModel, RoomModel, SearchModel
+from app.exceptions.exceptions import ErrorResponse
+import re
 
-router = APIRouter(
-    prefix="/api/v1",
-)
+router = APIRouter(prefix="/api/v1")
 
-@router.get("/test", tags=["Test the server"])
-def test():
-    return client.collection('grouprooms').get_full_list()
+@router.get("/all_rooms", response_model=List[RoomModel], summary="Get all rooms from database", responses={404: {"model": ErrorResponse, "description": "Rooms not found"}})
+async def get_all_rooms_info():
+    rooms = get_all_rooms()
+    if not rooms:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Rooms not found")
+    return rooms
 
-@router.get("/ping", tags=["Test the server"])
-def ping() -> TestModel:
-    return {"message": "pong"}
+@router.get("/room/{room_name}", response_model=RoomModel, summary="Get room info", responses={404: {"model": ErrorResponse, "description": "Room not found"}})
+async def get_room_info_route(room_name: str = Path(..., description="The name of the room to fetch")):
+    room = get_room_info(room_name)
+    if room is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Room not found")
+    return room
 
-@router.get("/room/{room_name}", tags=["Get room info"])
-def get_room_info_route(room_name: str):
-    return get_room_info(room_name)
+@router.get("/search/{search_input}", response_model=SearchModel, summary="Get search filtered results from database", responses={404: {"model": ErrorResponse, "description": "No results found"}})
+async def search_db(
+    search_input: str = Path(..., description="The search input to filter rooms", min_length=1, max_length=50),
+    room_size: Optional[str] = Query("", description="Filter by room size"),
+    building: Optional[str] = Query("", description="Filter by building"),
+    campus: Optional[str] = Query("", description="Filter by campus"),
+    equipment: Optional[str] = Query("", description="Filter by available equipment"),
+    room_name: Optional[str] = Query("", description="Filter by room name"),
+    first_come_first_served: Optional[str] = Query("", description="Filter by first come first served status"),
+    floor_level: Optional[str] = Query("", description="Filter by floor level")
+):
+    if not re.match(r"^[a-zA-Z0-9\s]*$", search_input):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid search input")
+    filters = {k: v for k, v in locals().items() if v is not None and k != "search_input"}
+    for k, v in filters.items():
+        if not re.match(r"^[a-zA-Z0-9\s]*$", v):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid filter input")
+    results = search_filter(search_input, filters)
+    if not results:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No results found")
+    return results
 
-@router.get("/search/{search_input}", tags=["Get room info"])
-def search_db(search_input, room_size : str = Query(""), building : str = Query(""), campus : str = Query(""), equipment : str = Query(""), room_name : str = Query(""), first_come_first_served : str = Query(""), floor_level : str = Query("")):
-    keys = ['room_size', 'building', 'campus', 'equipment', 'room_name', 'first_come_first_served', 'floor_level']
-    list_of_filters = [room_size, building, campus, equipment, room_name, first_come_first_served, floor_level]
-    list_of_filters = dict(zip(keys, list_of_filters))
-    return search_filter(search_input, list_of_filters)
-    
-
-@router.get("/room/reservation/{room_name}", tags=["Get reservation"])
-def get_reservation(room_name: str):
-    return show_room_reservations(room_name)
-
+@router.get("/room/reservation/{room_name}", response_model=List[ReservationModel], summary="Get room reservations", responses={404: {"model": ErrorResponse, "description": "No reservations found"}})
+async def get_reservation(room_name: str = Path(..., description="The name of the room to check reservations for")):
+    reservations = show_room_reservations(room_name)
+    if not reservations:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No reservations found")
+    return reservations
