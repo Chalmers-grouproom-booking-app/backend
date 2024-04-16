@@ -1,0 +1,18 @@
+name: Deploy
+
+on:
+    push:
+        branches: [main]
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        name: Build and deploy website to https://chalmers_grouproom.sacic.dev/
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v2
+            - name: Send notice in console showing that github actions is restarting the container
+              run: 'curl -H ''Authorization: Bearer ${{ secrets.pterodactyl_api_token }}'' -H ''Accept: application/json'' -H ''Content-Type: application/json'' -d ''{"command": "Github Actions finished, restarting"}'' ${{ secrets.pterodactyl_app_url }}/api/client/servers/${{ secrets.pterodactyl_server_id }}/command'
+            - name: Kill the server
+              run: 'curl -H ''Authorization: Bearer ${{ secrets.pterodactyl_api_token }}'' -H ''Content-Type: application/json'' -d ''{"signal": "kill"}'' ${{ secrets.pterodactyl_app_url }}/api/client/servers/${{ secrets.pterodactyl_server_id }}/power'
+            - name: Start server
+              run: 'curl -H ''Authorization: Bearer ${{ secrets.pterodactyl_api_token }}'' -H ''Content-Type: application/json'' -d ''{"signal": "start"}'' ${{ secrets.pterodactyl_app_url }}/api/client/servers/${{ secrets.pterodactyl_server_id }}/power'

@@ -61,7 +61,7 @@ def get_room_building(room: str) -> str:
 def show_room_reservations(room_name: str):
     
     new_filter = f"room.room_name='{room_name}'"
-    reservation_record =  client.collection('reservations').get_list(1, 10, {'filter': new_filter})
+    reservation_record =  client.collection('reservations').get_list(1, 50, {'filter': new_filter})
 
     reserved_times = []
     for res in reservation_record.items:
@@ -72,5 +72,5 @@ def show_room_reservations(room_name: str):
         reserved_times.append(reservation)
         
     if len(reserved_times) == 0:
-        return []
+        return [{"No reservations found"}]
     return reserved_times

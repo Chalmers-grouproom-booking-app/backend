@@ -1,13 +1,19 @@
 from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
+from apscheduler.schedulers.background import BackgroundScheduler
+from automatisation.auto_get_reservations import fetch_reservations
 from dotenv import load_dotenv
+import os
 import uvicorn
 
 load_dotenv()
 
-from app.routers import routes
+from routers import routes
 
 origins = []
+
+scheduler = BackgroundScheduler()
+
 
 app = FastAPI()
 
@@ -27,7 +33,14 @@ def check():
         "message": "Hello World!"
     }
 
+
 if __name__ == '__main__':
-    print("JEL")
-    uvicorn.run(app)
-    
+    if os.getenv("AUTO_FETCH_RESERVATIONS") == "True":
+        scheduler.add_job(fetch_reservations, "interval", seconds=60*10)
+        scheduler.start()
+        print("Scheduler started to fetch reservations every 10 minutes")
+        uvicorn.run(app, host="0.0.0.0", port=15029)
+        print("Scheduler stopped")
+        scheduler.shutdown()
+    else:
+        uvicorn.run(app, host="0.0.0.0", port=15029)
