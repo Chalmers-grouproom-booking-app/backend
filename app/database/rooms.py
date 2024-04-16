@@ -72,5 +72,5 @@ def show_room_reservations(room_name: str):
         reserved_times.append(reservation)
         
     if len(reserved_times) == 0:
-        return ["No reservations found"]
+        return [{"No reservations found"}]
     return reserved_times
