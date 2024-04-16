@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 import requests
 
 # Initialize TimeEdit API & and room cache
-timeedit = TimeEditAPI()
 room_cache = {}
 
 
@@ -30,6 +29,8 @@ def fetch_group_room_id(room_name):
     return room_cache[room_name]
 
 def fetch_reservations():
+    timeedit = TimeEditAPI()
+    
     reservations = timeedit.get_reservations( from_date= datetime.now(), to_date= datetime.now() + timedelta(days=14))
     for reservation in reservations["reservations"]:
         all_room_names = parse_rooms(reservation)
