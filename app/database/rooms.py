@@ -62,7 +62,6 @@ def show_room_reservations(room_name: str):
     
     new_filter = f"room.room_name='{room_name}'"
     reservation_record =  client.collection('reservations').get_list(1, 50, {'filter': new_filter})
-
     reserved_times = []
     for res in reservation_record.items:
         reservation = {
@@ -70,7 +69,7 @@ def show_room_reservations(room_name: str):
             "end-time": res.endtime
         }
         reserved_times.append(reservation)
-        
-    if len(reserved_times) == 0:
-        return [{"No reservations found"}]
+    print(len(reserved_times))
+    if len(reserved_times) < 1:
+        return []
     return reserved_times
