@@ -59,3 +59,16 @@ def show_room_reservations(room_name: str) -> List[ReservationModel]:
         }
         reserved_times.append(ReservationModel(**reservation))        
     return reserved_times
+
+def get_all_reservations(room_name: str) -> List[ReservationModel]:
+    reservations = RoomQuery(room_name).get_reservations()
+    reserved_times = []
+    for res in reservations:
+        reservation = {
+            "start_date": re.sub("-", "/", re.sub(" 00:00:00.000", "",res.startdate)),
+            "start_time": res.starttime,
+            "end_time": res.endtime,
+            "end_date": re.sub("-", "/", re.sub(" 00:00:00.000", "",res.enddate))
+        }
+        reserved_times.append(ReservationModel(**reservation))
+    return reserved_times
