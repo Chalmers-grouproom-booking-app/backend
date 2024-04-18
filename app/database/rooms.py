@@ -49,7 +49,7 @@ def show_room_reservations(room_name: str) -> List[ReservationModel]:
     reservations = RoomQuery(room_name).get_reservations()
     reserved_times = []
     for res in reservations:
-        if datetime.strptime(re.sub("-", "/", re.sub(" 00:00:00.000", "",res.startdate)), "%Y/%m/%d") < datetime.today():
+        if datetime.strptime(re.sub("-", "/", re.sub(" 00:00:00.000", "",res.startdate)), "%Y/%m/%d").date() < datetime.today().date():
             continue
         reservation = {
             "start_date": re.sub("-", "/", re.sub(" 00:00:00.000", "",res.startdate)),
