@@ -48,8 +48,10 @@ def show_room_reservations(room_name: str) -> List[ReservationModel]:
     reserved_times = []
     for res in reservations:
         reservation = {
+            "start_date": res.startdate,
             "start_time": res.starttime,
-            "end_time": res.endtime
+            "end_time": res.endtime,
+            "end_date": res.enddate
         }
         reserved_times.append(ReservationModel(**reservation))        
     return reserved_times
