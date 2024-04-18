@@ -1,6 +1,8 @@
 from typing import List
 from models.response import ReservationModel, RoomModel, SearchModel
 from database.queries import RoomQuery
+from datetime import datetime
+import re
 
 def get_room_info(room_name) -> RoomModel:
     return convert_room_to_dict( RoomQuery(room_name).get_room() )
@@ -47,11 +49,13 @@ def show_room_reservations(room_name: str) -> List[ReservationModel]:
     reservations = RoomQuery(room_name).get_reservations()
     reserved_times = []
     for res in reservations:
+        if datetime.strptime(re.sub("-", "/", re.sub(" 00:00:00.000", "",res.startdate)), "%Y/%m/%d") < datetime.today():
+            continue
         reservation = {
-            "start_date": res.startdate,
+            "start_date": re.sub("-", "/", re.sub(" 00:00:00.000", "",res.startdate)),
             "start_time": res.starttime,
             "end_time": res.endtime,
-            "end_date": res.enddate
+            "end_date": re.sub("-", "/", re.sub(" 00:00:00.000", "",res.enddate))
         }
         reserved_times.append(ReservationModel(**reservation))        
     return reserved_times
