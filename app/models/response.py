@@ -43,8 +43,10 @@ class RoomModel(BaseModel):
     stair: Optional[str]
 
 class ReservationModel(BaseModel):
+    start_date: str
     start_time: str
     end_time: str
+    end_date: str
 
 class SearchModel(BaseModel):
     building: Optional[ List[ RoomModel] ] 
