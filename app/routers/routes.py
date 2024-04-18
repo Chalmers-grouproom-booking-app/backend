@@ -15,14 +15,14 @@ async def get_all_rooms_info():
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Rooms not found")
     return rooms
 
-@router.get("/room/{room_name}", response_model=RoomModel, summary="Get room info", responses={404: {"model": ErrorResponse, "description": "Room not found"}})
+@router.get("/room", response_model=RoomModel, summary="Get room info", responses={404: {"model": ErrorResponse, "description": "Room not found"}})
 async def get_room_info_route(room_name: str = Depends(validate_input)):
     room = get_room_info(room_name)
     if room is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Room not found")
     return room
 
-@router.get("/search/{search_input}", response_model=SearchModel, summary="Get search filtered results from database", responses={404: {"model": ErrorResponse, "description": "No results found"}})
+@router.get("/search", response_model=SearchModel, summary="Get search filtered results from database", responses={404: {"model": ErrorResponse, "description": "No results found"}})
 async def search_db(
     search_input: str = Depends(validate_input),
     room_size: Optional[str] = Query("", description="Filter by room size"),
@@ -42,7 +42,7 @@ async def search_db(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No results found")
     return results
 
-@router.get("/room/reservation/{room_name}", response_model=List[ReservationModel], summary="Get room reservations", responses={404: {"model": ErrorResponse, "description": "No reservations found"}})
+@router.get("/room/reservation", response_model=List[ReservationModel], summary="Get room reservations", responses={404: {"model": ErrorResponse, "description": "No reservations found"}})
 async def get_reservation(room_name: str = Depends(validate_input)):
     reservations = show_room_reservations(room_name)
     if not reservations:
