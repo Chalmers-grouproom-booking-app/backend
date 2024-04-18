@@ -1,12 +1,11 @@
 from automatisation.timeedit_api import TimeEditAPI
-from database.pb import client
-import json
 from datetime import datetime, timedelta
+from database.pb import client
 import requests
+import json
 
 # Initialize TimeEdit API & and room cache
 room_cache = {}
-
 
 def parse_rooms(data):
     # Extract the string of rooms (assuming it's always in the first index)

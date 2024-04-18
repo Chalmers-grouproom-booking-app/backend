@@ -1,7 +1,7 @@
 from fastapi import FastAPI, status,Request 
 from fastapi.middleware.cors import CORSMiddleware
 from apscheduler.schedulers.background import BackgroundScheduler
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
 from automatisation.auto_get_reservations import fetch_reservations
 from dotenv import load_dotenv
 import os
@@ -27,11 +27,16 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+@app.get("/", response_class=HTMLResponse)
+def index():
+    file_path = os.path.dirname(os.path.realpath(__file__))
+    html_path = os.path.join(file_path, "templates", "index.html")
+    html_content = open(html_path, "r", encoding="utf-8").read()
+    return HTMLResponse(content=html_content, status_code=status.HTTP_200_OK)
 
 @app.get("/ping", status_code=status.HTTP_200_OK, tags=["API Check"], summary="Check if the API is up")
 def check():
     return {"message": "pong"}
-
 
 @app.exception_handler(Exception)
 async def general_exception_handler(request: Request, exc: Exception):
