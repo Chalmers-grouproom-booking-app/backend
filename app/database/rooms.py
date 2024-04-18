@@ -48,8 +48,11 @@ def room_format(room_record: dict) -> SearchModel:
 def show_room_reservations(room_name: str) -> List[ReservationModel]:
     reservations = RoomQuery(room_name).get_reservations()
     reserved_times = []
+
+    current_date = datetime.today().date()
     for res in reservations:
-        if datetime.strptime(re.sub("-", "/", re.sub(" 00:00:00.000", "",res.startdate)), "%Y/%m/%d").date() < datetime.today().date():
+        reserved_date = datetime.strptime(re.sub("-", "/", re.sub(" 00:00:00.000", "",res.startdate)), "%Y/%m/%d").date()
+        if reserved_date < current_date:
             continue
         reservation = {
             "start_date": re.sub("-", "/", re.sub(" 00:00:00.000", "",res.startdate)),
