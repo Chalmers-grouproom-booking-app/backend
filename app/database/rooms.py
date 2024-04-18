@@ -63,7 +63,7 @@ def show_room_reservations(room_name: str) -> List[ReservationModel]:
         reserved_times.append(ReservationModel(**reservation))        
     return reserved_times
 
-def get_all_reservations(room_name: str) -> List[ReservationModel]:
+def show_all_reservations(room_name: str) -> List[ReservationModel]:
     reservations = RoomQuery(room_name).get_reservations()
     reserved_times = []
     for res in reservations:
