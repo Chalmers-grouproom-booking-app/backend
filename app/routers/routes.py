@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Query, HTTPException, status, Path, Response
 from typing import List, Optional
 from database.filter import search_filter
-from database.rooms import get_all_rooms, get_room_info, show_room_reservations
+from database.rooms import get_all_rooms, get_room_info, show_room_reservations, show_all_reservations
 from models.response import ReservationModel, RoomModel, SearchModel
 from exceptions.exceptions import ErrorResponse
 from utils import validate_input
@@ -45,6 +45,13 @@ async def search_db(
 @router.get("/room/reservation", response_model=List[ReservationModel], summary="Get room reservations", responses={404: {"model": ErrorResponse, "description": "No reservations found"}})
 async def get_reservation(room_name: str = Depends(validate_input)):
     reservations = show_room_reservations(room_name)
+    if not reservations:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No reservations found")
+    return reservations
+
+@router.get("/room/reservation/all", response_model=List[ReservationModel], summary="Get room reservations", responses={404: {"model": ErrorResponse, "description": "No reservations found"}})
+async def get_reservation(room_name: str = Depends(validate_input)):
+    reservations = show_all_reservations(room_name)
     if not reservations:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No reservations found")
     return reservations
