@@ -14,7 +14,6 @@ class TimeEditAPI:
     hasLoggedin : bool = False
     faildCount : int = 0
     scramble = TimeEditScramble()
-    
     def __init__(self, auth_url = None):
         if (auth_url is not None):
             self.auth_url = auth_url
