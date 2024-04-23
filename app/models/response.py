@@ -48,7 +48,7 @@ class ReservationModel(BaseModel):
     end_time: str
     end_date: str
 
-class BookedModel(BaseModel): ### Kanske ta bort och lägga i RoomModel
+class BookedModel(BaseModel): ### Kanske ta bort och lägga i RoomModel!
     booked: bool
 
 class BuildingModel(BaseModel):
