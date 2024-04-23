@@ -34,3 +34,14 @@ class RoomQuery:
     def get_all_rooms(cls):
         """Return all rooms in the database."""
         return client.collection('grouprooms').get_full_list()
+
+class BuildingQuery:
+    MAX_RESERVATIONS = 50
+
+    def __init__(self, building: str):
+        self.building = building
+        
+    def get_all_rooms_in_building(self):
+        """Return all rooms in a building"""
+        reservation_filter = f"building='{self.building}'"
+        rooms = client.collection('grouprooms').get_list(1, self.MAX_RESERVATIONS, {'filter': reservation_filter}).items
