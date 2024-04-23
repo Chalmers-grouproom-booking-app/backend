@@ -5,3 +5,4 @@ pocketbase
 apscheduler
 requests
 beautifulsoup4
+python-multipart
