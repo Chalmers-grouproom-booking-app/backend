@@ -1,3 +1,4 @@
+from exceptions.exceptions import RoomNotFoundException
 from database.pb import client
 
 class RoomQuery:
@@ -11,10 +12,9 @@ class RoomQuery:
 
     def _get_room_record(self):
         """Fetch the room record from the database."""
-        fetch = client.collection('grouprooms').get_list(1, 1,  {'filter': self.room_filter})
+        fetch = client.collection('grouprooms').get_list(1, 1, {'filter': self.room_filter})
         if fetch.total_items == 0:
-            raise ValueError(f"Room '{self.room_name}' not found.")
-        
+            raise RoomNotFoundException(f"Room '{self.room_name}' not found.")
         return fetch.items[0]
 
     def get_building(self):

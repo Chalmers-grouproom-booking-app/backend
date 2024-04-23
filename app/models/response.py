@@ -32,15 +32,15 @@ class RoomModel(BaseModel):
     room_size: Optional[int]
     building: str
     campus: str
-    equipment: Optional[str]
+    equipment: Optional[str] 
     longitude: float
     latitude: float
     entrance_latitude: float
     entrance_longitude: float
-    description: Optional[str]
+    description: Optional[str] 
     first_come_first_served: bool
-    floor_level: Optional[int]
-    stair: Optional[str]
+    floor_level: Optional[int] 
+    stair: Optional[str] 
 
 class ReservationModel(BaseModel):
     start_date: str

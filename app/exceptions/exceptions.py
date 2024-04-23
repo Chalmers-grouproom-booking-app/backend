@@ -16,7 +16,6 @@ class RoomNotFoundException(HTTPException):
 class InvalidInputException(HTTPException):
     def __init__(self, detail: str = "Invalid input", code: int = 422):
         super().__init__(status_code=code, detail=detail)
-
 class ReservationsNotFoundException(HTTPException):
     def __init__(self, detail: str = "No reservations found", code: int = 404):
         super().__init__(status_code=code, detail=detail)  

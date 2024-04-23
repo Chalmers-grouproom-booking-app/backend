@@ -1,4 +1,5 @@
-from models.response import RoomModel
+from exceptions.exceptions import RoomsNotFoundException
+from models.response import RoomModel, RoomDetails
 from database.pb import client
 from database.rooms import room_format
 
@@ -23,11 +24,18 @@ def search(search_result : str):
 def search_filter(search_result : str, filter : dict = {}):
     data = {}
     filter_result = filter_results(filter)
+    empty_counter = 1
+    total_fields = len(RoomDetails.__fields__.keys()) - len(UNWANTED_FIELDS)
     for field in RoomModel.__fields__.keys():
         if field not in UNWANTED_FIELDS:
             records = client.collection('grouprooms').get_list(query_params={'filter': f'{field}~"{search_result}"' + filter_result})
+            if len(records.items) == 0:
+                empty_counter += 1
             data.update({field : records.items})
-        
+    if empty_counter == total_fields:
+        raise RoomsNotFoundException(f"No rooms found with the search term '{search_result}'")
+    print(empty_counter)
+    print(total_fields)
     formatted_data = room_format(data)
     return formatted_data
 
