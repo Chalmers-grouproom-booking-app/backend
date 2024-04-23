@@ -10,15 +10,16 @@ import uvicorn
 load_dotenv()
 
 from routers import routes
+from app.routers import timeedit_routes
 
 origins = []
 
 scheduler = BackgroundScheduler()
 
-
 app = FastAPI()
 
 app.include_router(routes.router)
+app.include_router(timeedit_routes.router)
 
 app.add_middleware(
     CORSMiddleware,
