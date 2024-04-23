@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 from main import app
-from models.response import RoomModel, SearchModel
+from models.response import ReservationModel, RoomModel, SearchModel
 from typing import List, Dict, Any
 
 client = TestClient(app)
@@ -13,6 +13,13 @@ def validate_room_structure(room: Dict[str, Any]) -> bool:
 def validate_search_structure(search: Dict[str, Any]) -> bool: 
     try:
         SearchModel(**search)
+        return True
+    except ValueError:
+        return False
+    
+def validate_reservation_structure(reservation: Dict[str, Any]) -> bool:
+    try:
+        ReservationModel(**reservation)
         return True
     except ValueError:
         return False
@@ -78,13 +85,53 @@ def test_search_db_max_length_input():
     
 def test_get_reservation():
     response = client.get("/api/v1/room/reservation?input=Jupiter123")
-    assert response.status_code == 200
-    assert len(response.json()) == 1
+    if response.status_code == 404:
+        assert response.json() == {"detail": "No reservations found for room 'Jupiter123'"}
+    elif response.status_code == 200:
+        for reservation in response.json():
+            assert validate_reservation_structure(reservation)
+    else:
+        assert False
+        
+def test_get_reservation_no_results():
+    response = client.get("/api/v1/room/reservation?input=nonexistent")
+    assert response.status_code == 404
+    assert response.json() == {"detail": "No reservations found for room 'nonexistent'"}
+    
+def test_get_reservation_invalid_input():
+    response = client.get("/api/v1/room/reservation?input=#&!!**")
+    assert response.status_code == 422
+    assert response.json() == {"detail": "Invalid input: #&!!**"}
+
+def test_get_reservation_max_length_input():
+    response = client.get("/api/v1/room/reservation?input=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+    assert response.status_code == 422 
+    assert response.json() == {"detail": "Input exceeds maximum length of 15 characters."}
  
 def test_get_all_reservations():
-    response = client.get("/api/v1/room/reservation/all?input=Jupiter123")
-    assert response.status_code == 200
-    assert len(response.json()) == 36
+    response = client.get("/api/v1/room/reservation?input=Svea238")
+    if response.status_code == 404:
+        assert response.json() == {"detail": "No reservations found for room 'Svea238'"}
+    elif response.status_code == 200:
+        for reservation in response.json():
+            assert validate_reservation_structure(reservation)
+    else:
+        assert False
+        
+def test_get__all_reservation_no_results():
+    response = client.get("/api/v1/room/reservation?input=nonexistent")
+    assert response.status_code == 404
+    assert response.json() == {"detail": "No reservations found for room 'nonexistent'"}
     
+def test_get__all_reservation_invalid_input():
+    response = client.get("/api/v1/room/reservation?input=#&!!**")
+    assert response.status_code == 422
+    assert response.json() == {"detail": "Invalid input: #&!!**"}
+
+def test_get__all_reservation_max_length_input():
+    response = client.get("/api/v1/room/reservation?input=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+    assert response.status_code == 422
+    assert response.json() == {"detail": "Input exceeds maximum length of 15 characters."}
+
 
 

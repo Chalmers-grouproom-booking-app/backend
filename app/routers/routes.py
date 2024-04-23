@@ -46,12 +46,12 @@ async def search_db(
 async def get_reservation(room_name: str = Depends(validate_input)):
     reservations = show_room_reservations(room_name)
     if not reservations:
-        raise ReservationsNotFoundException()
+        raise ReservationsNotFoundException(f"No reservations found for room '{room_name}'")
     return reservations
 
 @router.get("/room/reservation/all", response_model=List[ReservationModel], summary="Get room reservations", responses={404: {"model": ErrorResponse, "description": "No reservations found"}})
 async def get_reservation(room_name: str = Depends(validate_input)):
     reservations = show_all_reservations(room_name)
     if not reservations:
-        raise ReservationsNotFoundException()
+        raise ReservationsNotFoundException(f"No reservations found for room '{room_name}'")
     return reservations
