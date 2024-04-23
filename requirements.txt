@@ -6,3 +6,4 @@ apscheduler
 requests
 beautifulsoup4
 pytest
+python-multipart

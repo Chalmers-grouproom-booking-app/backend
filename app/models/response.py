@@ -2,6 +2,8 @@ from pydantic import BaseModel
 from typing import List, Optional
 import datetime
 
+class Login(BaseModel):
+    login: str
 
 class RoomDetails(BaseModel):
     id: str
