@@ -10,7 +10,7 @@ import uvicorn
 load_dotenv()
 
 from routers import routes
-from app.routers import timeedit_routes
+from routers import timeedit_routes
 
 origins = []
 
