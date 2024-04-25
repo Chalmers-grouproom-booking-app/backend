@@ -61,7 +61,8 @@ def test_get_nonexistent_room_info():
     assert response.json() == {"detail": "Room 'nonexistent' not found."}
     
 def test_get_room_info_invalid_input():
-    response = client.get("/api/v1/room?input=#&!!**")
+    response = client.get("/api/v1/room", params={"input": "#&!!**"})
+    print(response.json())
     assert response.status_code == 422
     assert response.json() == {"detail": "Invalid input: #&!!**"}
 
@@ -82,7 +83,7 @@ def test_search_db_no_results():
     assert response.json() == {"detail": "No rooms found with the search term 'nonexistent'"}
 
 def test_search_db_invalid_input():
-    response = client.get("/api/v1/search?input=#&!!**")
+    response = client.get("/api/v1/search", params={"input": "#&!!**"})
     assert response.status_code == 422
     assert response.json() == {"detail": "Invalid input: #&!!**"}
 
@@ -109,7 +110,7 @@ def test_get_reservation_no_results():
     assert response.json() == {"detail": "No reservations found for room 'nonexistent'"}
     
 def test_get_reservation_invalid_input():
-    response = client.get("/api/v1/room/reservation?input=#&!!**")
+    response = client.get("/api/v1/room/reservation", params={"input": "#&!!**"})
     assert response.status_code == 422
     assert response.json() == {"detail": "Invalid input: #&!!**"}
 
@@ -136,7 +137,7 @@ def test_get__all_reservation_no_results():
     assert response.json() == {"detail": "No reservations found for room 'nonexistent'"}
     
 def test_get__all_reservation_invalid_input():
-    response = client.get("/api/v1/room/reservation?input=#&!!**")
+    response = client.get("/api/v1/room/reservation", params={"input": "#&!!**"})
     assert response.status_code == 422
     assert response.json() == {"detail": "Invalid input: #&!!**"}
 
