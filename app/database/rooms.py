@@ -89,14 +89,14 @@ def is_room_booked(room_name: str) -> bool:
     
     for res in reservations:
         if (compare_reservation_times(res) == True):
-            break
+            return [{"booked": True}]
         
     return [{"booked": False}]
     
     
 def compare_reservation_times(reservation):
     # The time-interval to be checked
-    INTERVAL: int = 2
+    INTERVAL: int = 0
 
     # If the start date of reservation is not today return False
     reserved_date = datetime.strptime(re.sub("-", "/", re.sub(" 00:00:00.000", "",reservation.start_date)), "%Y/%m/%d").date()
@@ -104,9 +104,10 @@ def compare_reservation_times(reservation):
         return False
     
     # Get current time and start time of reservation + start time with interval
-    start_time = datetime.strptime(reservation.start_time, "%H:%M")
-    start_time_interval = datetime.now() + timedelta(hours=INTERVAL)
-    current_time = datetime.now()
+    start_time = datetime.strptime(reservation.start_time, "%H:%M").time().strftime("%H:%M")
+    end_time = datetime.strptime(reservation.end_time, "%H:%M").time().strftime("%H:%M")
+    start_time_interval = (datetime.now() + timedelta(hours=INTERVAL)).time().strftime("%H:%M")
+    current_time = datetime.now().time().strftime("%H:%M")
 
     # If the booked time does not lie within [now, now+2h] return False
     if (current_time < start_time or current_time > start_time_interval):
@@ -115,25 +116,25 @@ def compare_reservation_times(reservation):
 
 def __booked_percentage(building_name: str) -> float:
     # Get all rooms of a building
-
     rooms = BuildingQuery(building_name).get_all_rooms_in_building()
     
     # Filter out first come first serve rooms
     filtered_rooms: int = 0
     booked_rooms: int = 0
-
-    for r in format_all_rooms(rooms):
+    
+    for r in rooms:
         if(not r.first_come_first_served):
             filtered_rooms += 1
 
             if(is_room_booked(r.room_name)):
                 booked_rooms += 1
+            print(r.room_name, is_room_booked(r.room_name))
             
     # Loop over all rooms in a building
-    percentage: float = booked_rooms / filtered_rooms
-    
+    percentage: float = booked_rooms / max(1, filtered_rooms)
+    print(booked_rooms, filtered_rooms, percentage)
     return percentage
 
 def calculate_rgb_color(building_name : str):
     inverted_percentage = 1 - __booked_percentage(building_name)
-    return [255 * inverted_percentage, 255 * inverted_percentage, 255 * inverted_percentage]
+    return [int(255 * inverted_percentage), int(255 * inverted_percentage), int(255 * inverted_percentage)]
