@@ -138,4 +138,4 @@ def __booked_percentage(building_name: str) -> float:
 
 def calculate_rgb_color(building_name : str):
     inverted_percentage = 1 - __booked_percentage(building_name)
-    return [int(255 * inverted_percentage), int(255 * inverted_percentage), int(255 * inverted_percentage)]
+    return [int(255 * inverted_percentage), int(255 * inverted_percentage), 0]
