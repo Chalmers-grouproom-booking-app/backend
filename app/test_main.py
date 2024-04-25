@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 from main import app
 from models.response import ReservationModel, RoomModel, SearchModel
-from typing import List, Dict, Any
+from typing import Dict, Any
 
 client = TestClient(app)
 
