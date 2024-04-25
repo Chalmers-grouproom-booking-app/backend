@@ -95,7 +95,7 @@ def is_room_booked(room_name: str) -> bool:
     
 def compare_reservation_times(reservation):
     # The time-interval to be checked
-    INTERVAL: int = 0
+    INTERVAL: int = 1
 
     # If the start date of reservation is not today return False
     reserved_date = datetime.strptime(re.sub("-", "/", re.sub(" 00:00:00.000", "",reservation.start_date)), "%Y/%m/%d").date()
