@@ -106,13 +106,19 @@ def compare_reservation_times(reservation):
     # Get current time and start time of reservation + start time with interval
     start_time = datetime.strptime(reservation.start_time, "%H:%M").time().strftime("%H:%M")
     end_time = datetime.strptime(reservation.end_time, "%H:%M").time().strftime("%H:%M")
-    start_time_interval = (datetime.now() + timedelta(hours=INTERVAL)).time().strftime("%H:%M")
+    current_time_interval = (datetime.now() + timedelta(hours=INTERVAL)).time().strftime("%H:%M")
     current_time = datetime.now().time().strftime("%H:%M")
 
-    # If the booked time does not lie within [now, now+2h] return False
-    if (current_time < start_time or current_time > start_time_interval):
-        return False
-    return True
+    start_ahead          =  current_time > start_time           # We have passed the start time      --C---S--------E--
+    end_behind           =  current_time < end_time             # The booking has not finished       --S---C--------E--
+    interval_start_ahead =  current_time_interval > start_time  # Room is not booked within interval --C---I--S-----E--
+    interval_end_behind  =  current_time_interval < end_time    # Room is booked within interval     --C-----S--I---E--
+
+    # If the booked time lies within [now, now+2h] return True
+    if ((start_ahead and end_behind) or (interval_start_ahead and interval_end_behind)):
+        return True
+    return False
+
 
 def __booked_percentage(building_name: str) -> float:
     # Get all rooms of a building
@@ -131,7 +137,7 @@ def __booked_percentage(building_name: str) -> float:
             print(r.room_name, is_room_booked(r.room_name))
             
     # Loop over all rooms in a building
-    percentage: float = booked_rooms / max(1, filtered_rooms)
+    percentage: float = booked_rooms / max(filtered_rooms, 1)
     print(booked_rooms, filtered_rooms, percentage)
     return percentage
 
