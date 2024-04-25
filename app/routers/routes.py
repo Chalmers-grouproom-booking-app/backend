@@ -3,8 +3,8 @@ from typing import List, Optional
 from database.filter import search_filter
 from database.rooms import get_all_rooms, get_room_info, show_room_reservations, show_all_reservations
 from models.response import ReservationModel, RoomModel, SearchModel
-from exceptions.exceptions import ErrorResponse
 from utils import validate_input
+from exceptions.exceptions import ErrorResponse, RoomsNotFoundException, RoomNotFoundException, ReservationsNotFoundException
 
 router = APIRouter(prefix="/api/v1")
 
@@ -12,14 +12,14 @@ router = APIRouter(prefix="/api/v1")
 async def get_all_rooms_info():
     rooms = get_all_rooms()
     if not rooms:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Rooms not found")
+        raise RoomsNotFoundException()
     return rooms
 
 @router.get("/room", response_model=RoomModel, summary="Get room info", responses={404: {"model": ErrorResponse, "description": "Room not found"}})
 async def get_room_info_route(room_name: str = Depends(validate_input)):
     room = get_room_info(room_name)
     if room is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Room not found")
+        raise RoomNotFoundException()
     return room
 
 @router.get("/search", response_model=SearchModel, summary="Get search filtered results from database", responses={404: {"model": ErrorResponse, "description": "No results found"}})
@@ -39,19 +39,19 @@ async def search_db(
             validate_input(value)  # Apply validation to each filter
     results = search_filter(search_input, filters)
     if not results:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No results found")
+        raise RoomsNotFoundException()
     return results
 
 @router.get("/room/reservation", response_model=List[ReservationModel], summary="Get room reservations", responses={404: {"model": ErrorResponse, "description": "No reservations found"}})
 async def get_reservation(room_name: str = Depends(validate_input)):
     reservations = show_room_reservations(room_name)
     if not reservations:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No reservations found")
+        raise ReservationsNotFoundException(f"No reservations found for room '{room_name}'")
     return reservations
 
 @router.get("/room/reservation/all", response_model=List[ReservationModel], summary="Get room reservations", responses={404: {"model": ErrorResponse, "description": "No reservations found"}})
 async def get_reservation(room_name: str = Depends(validate_input)):
     reservations = show_all_reservations(room_name)
     if not reservations:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No reservations found")
+        raise ReservationsNotFoundException(f"No reservations found for room '{room_name}'")
     return reservations
