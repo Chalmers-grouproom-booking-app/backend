@@ -33,10 +33,16 @@ class RoomQuery:
         """Return the  record."""
         return self._get_room_record()
     
+    def get_room_id(self):
+        """Return the room ID."""
+        return self._get_room_record().room_id
+    
     @classmethod
     def get_all_rooms(cls):
         """Return all rooms in the database."""
         return client.collection('grouprooms').get_full_list()
+    
+    
 
 class BuildingQuery:
     MAX_RESERVATIONS = 50

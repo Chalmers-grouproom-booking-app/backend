@@ -28,6 +28,9 @@ class RoomDetails(BaseModel):
     room_size: int
     stair: Optional[str]
 
+#only room id
+class RoomId(BaseModel):
+    room_id: int
 
 class RoomModel(BaseModel):
     room_name: str
