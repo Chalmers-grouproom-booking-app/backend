@@ -45,3 +45,4 @@ class BuildingQuery:
         """Return all rooms in a building"""
         reservation_filter = f"building='{self.building}'"
         rooms = client.collection('grouprooms').get_list(1, self.MAX_RESERVATIONS, {'filter': reservation_filter}).items
+        return rooms
