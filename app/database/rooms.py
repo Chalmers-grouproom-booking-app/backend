@@ -131,14 +131,11 @@ def __booked_percentage(building_name: str) -> float:
     for r in rooms:
         if(not r.first_come_first_served):
             filtered_rooms += 1
-
-            if(is_room_booked(r.room_name)):
+            if(is_room_booked(r.room_name) == [{"booked": True}]):
                 booked_rooms += 1
-            print(r.room_name, is_room_booked(r.room_name))
-            
+    
     # Loop over all rooms in a building
     percentage: float = booked_rooms / max(filtered_rooms, 1)
-    print(booked_rooms, filtered_rooms, percentage)
     return percentage
 
 def calculate_rgb_color(building_name : str):
