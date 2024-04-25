@@ -4,6 +4,8 @@ from models.response import ReservationModel, RoomModel, SearchModel
 from typing import List, Dict, Any
 
 client = TestClient(app)
+
+# Helper functions
 def validate_room_structure(room: Dict[str, Any]) -> bool:
     try:
         RoomModel(**room)
@@ -24,12 +26,15 @@ def validate_reservation_structure(reservation: Dict[str, Any]) -> bool:
     except ValueError:
         return False
 
+
+# Get all rooms tests
 def test_get_all_rooms():
     response = client.get("/api/v1/all_rooms")
     assert response.status_code == 200
     for room in response.json():
         assert validate_room_structure(room)
 
+# Get room tests
 def test_get_room_info():
     response = client.get("/api/v1/room?input=Svea238")
     assert response.status_code == 200
@@ -48,6 +53,7 @@ def test_get_room_info():
         "floor_level": 0,
         "stair": ""
     }
+
 def test_get_nonexistent_room_info():
     response = client.get("/api/v1/room?input=nonexistent")
     assert response.status_code == 404
@@ -63,6 +69,7 @@ def test_get_room_info_max_length_input():
     assert response.status_code == 422
     assert response.json() == {"detail": "Input exceeds maximum length of 15 characters."}
 
+# Search tests
 def test_search_db():
     response = client.get("/api/v1/search?input=Jupiter")
     assert response.status_code == 200
@@ -83,6 +90,8 @@ def test_search_db_max_length_input():
     assert response.status_code == 422
     assert response.json() == {"detail": "Input exceeds maximum length of 15 characters."}
     
+    
+# Get reservation tests
 def test_get_reservation():
     response = client.get("/api/v1/room/reservation?input=Jupiter123")
     if response.status_code == 404:
@@ -107,7 +116,9 @@ def test_get_reservation_max_length_input():
     response = client.get("/api/v1/room/reservation?input=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
     assert response.status_code == 422 
     assert response.json() == {"detail": "Input exceeds maximum length of 15 characters."}
- 
+    
+    
+# Get all reservations tests
 def test_get_all_reservations():
     response = client.get("/api/v1/room/reservation?input=Svea238")
     if response.status_code == 404:
