@@ -59,7 +59,7 @@ async def get_reservation(room_name: str = Depends(validate_input)):
 
 @router.get("/room/booked", response_model=List[BookedModel], summary="Get room booked status", responses={404: {"model": ErrorResponse, "description": "No room found"}})
 async def get_room_booked(room_name: str = Depends(validate_input)):
-    booked = is_room_booked(room_name)
+    booked = [{"booked": is_room_booked(room_name)}]
     #if booked == None:
     #    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No room found")
     return booked

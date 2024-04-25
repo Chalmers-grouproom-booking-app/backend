@@ -85,13 +85,12 @@ def is_room_booked(room_name: str) -> bool:
 
     # If no reservations return False
     if (len(reservations) <= 0):
-        return [{"booked": False}]
+        return False
     
     for res in reservations:
         if (compare_reservation_times(res) == True):
-            return [{"booked": True}]
-        
-    return [{"booked": False}]
+            return True
+    return False
     
     
 def compare_reservation_times(reservation):
@@ -131,9 +130,8 @@ def __booked_percentage(building_name: str) -> float:
     for r in rooms:
         if(not r.first_come_first_served):
             filtered_rooms += 1
-            if(is_room_booked(r.room_name) == [{"booked": True}]):
+            if(is_room_booked(r.room_name)):
                 booked_rooms += 1
-    
     # Loop over all rooms in a building
     percentage: float = booked_rooms / max(filtered_rooms, 1)
     return percentage
