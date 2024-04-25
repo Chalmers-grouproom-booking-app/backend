@@ -3,7 +3,8 @@ from typing import List
 
 class Login(BaseModel):
     login: str
-    
+    username: str
+    cookies: dict
 
 class ReservationModel(BaseModel):
     id: str
