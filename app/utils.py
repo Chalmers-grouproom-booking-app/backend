@@ -1,11 +1,13 @@
 import re
 from exceptions.exceptions import InvalidInputException
 
+MAX_LENGTH = 20
+
 def validate_input(input: str) -> str:
     if input == '':
         return input
     if len(input) > 20:
-        raise InvalidInputException("Input exceeds maximum length of 20 characters.")
+        raise InvalidInputException(f"Input exceeds maximum length of {MAX_LENGTH} characters.")
     if not re.match(r"^[a-zA-Z0-9\s_\-,åÅäÄöÖ]*$", input):
         raise InvalidInputException(f"Invalid input: {input}")
     return input

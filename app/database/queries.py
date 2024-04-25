@@ -23,6 +23,9 @@ class RoomQuery:
 
     def get_reservations(self):
         """Return the reservation records for the room."""
+        fetch = client.collection('grouprooms').get_list(1, 1, {'filter': self.room_filter})
+        if fetch.total_items == 0:
+            raise RoomNotFoundException(f"Room '{self.room_name}' not found.")
         reservation_filter = f"room.room_name='{self.room_name}'"
         return client.collection('reservations').get_list(1, self.MAX_RESERVATIONS, {'filter': reservation_filter}).items
 
@@ -45,4 +48,6 @@ class BuildingQuery:
         """Return all rooms in a building"""
         reservation_filter = f"building='{self.building}'"
         rooms = client.collection('grouprooms').get_list(1, self.MAX_RESERVATIONS, {'filter': reservation_filter}).items
+        if not rooms:
+            raise RoomNotFoundException(f"No building found called '{self.building}'")
         return rooms

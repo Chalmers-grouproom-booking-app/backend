@@ -61,14 +61,14 @@ async def get_reservation(room_name: str = Depends(validate_input)):
 async def get_room_booked(room_name: str = Depends(validate_input)):
     booked = [{"booked": is_room_booked(room_name)}]
     if booked == None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No room found")
+        raise RoomNotFoundException('No booking found')
     return booked
 
 @router.get("/building/color", response_model=List[BuildingModel], summary="Get building color", responses={404: {"model": ErrorResponse, "description": "No building found"}})
 async def get_rgb_color(building_name: str = Depends(validate_input)):
     color = calculate_rgb_color(building_name)
     if color == None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No building found")
+        raise RoomNotFoundException('No building found')
     return [{
         "building_name": building_name, 
         "color": color
