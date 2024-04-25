@@ -15,6 +15,13 @@ def get_all_rooms():
 def format_all_rooms( room_records: list ) -> list[RoomModel]:
     return [ convert_room_to_dict(room) for room in room_records ]
 
+def get_room_id(room_name: str) -> int:
+    try:
+        room_id = RoomQuery(room_name).get_room_id()
+        return room_id
+    except Exception as e:
+        return None
+
 def convert_room_to_dict( room ) -> RoomModel:
     return {
         "room_name": room.room_name,
