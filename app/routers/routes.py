@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, Query, HTTPException, status, Path, Response
 from typing import List, Optional
 from database.filter import search_filter
-from database.rooms import get_all_rooms, get_room_info, show_room_reservations, show_all_reservations
-from models.response import ReservationModel, RoomModel, SearchModel
+from database.rooms import get_all_rooms, get_room_info, show_room_reservations, show_all_reservations, is_room_booked, calculate_rgb_color
+from models.response import ReservationModel, RoomModel, SearchModel, BookedModel, BuildingModel
+from exceptions.exceptions import ErrorResponse
 from utils import validate_input
 from exceptions.exceptions import ErrorResponse, RoomsNotFoundException, RoomNotFoundException, ReservationsNotFoundException
 
@@ -55,3 +56,20 @@ async def get_reservation(room_name: str = Depends(validate_input)):
     if not reservations:
         raise ReservationsNotFoundException(f"No reservations found for room '{room_name}'")
     return reservations
+
+@router.get("/room/booked", response_model=List[BookedModel], summary="Get room booked status", responses={404: {"model": ErrorResponse, "description": "No room found"}})
+async def get_room_booked(room_name: str = Depends(validate_input)):
+    booked = [{"booked": is_room_booked(room_name)}]
+    if booked == None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No room found")
+    return booked
+
+@router.get("/building/color", response_model=List[BuildingModel], summary="Get building color", responses={404: {"model": ErrorResponse, "description": "No building found"}})
+async def get_rgb_color(building_name: str = Depends(validate_input)):
+    color = calculate_rgb_color(building_name)
+    if color == None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No building found")
+    return [{
+        "building_name": building_name, 
+        "color": color
+    }]
