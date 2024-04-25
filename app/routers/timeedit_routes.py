@@ -31,7 +31,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         timeedit_cookies = timeedit.get_cookies() 
         serialized_cookies = json.dumps(timeedit_cookies)
         response = JSONResponse(content={"login": "success", "username": username})
-        response.set_cookie(key="timeedit_cookies", value=serialized_cookies, httponly=True, secure=True, samesite='Lax')
+        response.set_cookie(key="timeedit_cookies", value=serialized_cookies, httponly=False, secure=True, samesite='None')
         return response
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
