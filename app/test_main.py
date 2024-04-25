@@ -12,6 +12,7 @@ def validate_room_structure(room: Dict[str, Any]) -> bool:
         return True
     except ValueError:
         return False
+
 def validate_search_structure(search: Dict[str, Any]) -> bool: 
     try:
         SearchModel(**search)
