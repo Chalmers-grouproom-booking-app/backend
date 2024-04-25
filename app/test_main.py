@@ -69,7 +69,7 @@ def test_get_room_info_invalid_input():
 def test_get_room_info_max_length_input():
     response = client.get("/api/v1/room?input=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
     assert response.status_code == 422
-    assert response.json() == {"detail": "Input exceeds maximum length of 15 characters."}
+    assert response.json() == {"detail": "Input exceeds maximum length of 20 characters."}
 
 # Search tests
 def test_search_db():
@@ -90,7 +90,7 @@ def test_search_db_invalid_input():
 def test_search_db_max_length_input():
     response = client.get("/api/v1/search?input=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
     assert response.status_code == 422
-    assert response.json() == {"detail": "Input exceeds maximum length of 15 characters."}
+    assert response.json() == {"detail": "Input exceeds maximum length of 20 characters."}
     
     
 # Get reservation tests
@@ -117,7 +117,7 @@ def test_get_reservation_invalid_input():
 def test_get_reservation_max_length_input():
     response = client.get("/api/v1/room/reservation?input=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
     assert response.status_code == 422 
-    assert response.json() == {"detail": "Input exceeds maximum length of 15 characters."}
+    assert response.json() == {"detail": "Input exceeds maximum length of 20 characters."}
     
     
 # Get all reservations tests
@@ -144,7 +144,7 @@ def test_get__all_reservation_invalid_input():
 def test_get__all_reservation_max_length_input():
     response = client.get("/api/v1/room/reservation?input=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
     assert response.status_code == 422
-    assert response.json() == {"detail": "Input exceeds maximum length of 15 characters."}
+    assert response.json() == {"detail": "Input exceeds maximum length of 20 characters."}
 
 
 
