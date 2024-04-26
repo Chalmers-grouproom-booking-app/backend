@@ -87,7 +87,7 @@ def show_all_reservations(room_name: str) -> List[ReservationModel]:
     return reserved_times
 
 
-def is_room_booked(room_name: str) -> bool:
+def is_room_booked(room_name: str, interval_forward_hours: float) -> bool:
     reservations = show_room_reservations(room_name)
 
     # If no reservations return False
@@ -95,15 +95,12 @@ def is_room_booked(room_name: str) -> bool:
         return False
     
     for res in reservations:
-        if (compare_reservation_times(res) == True):
+        if (__compare_reservation_times(res, interval_forward_hours)):
             return True
     return False
     
     
-def compare_reservation_times(reservation):
-    # The time-interval to be checked
-    INTERVAL: int = 1
-
+def __compare_reservation_times(reservation, interval_forward_hours):
     # If the start date of reservation is not today return False
     reserved_date = datetime.strptime(re.sub("-", "/", re.sub(" 00:00:00.000", "",reservation.start_date)), "%Y/%m/%d").date()
     if(reserved_date != datetime.today().date()):
@@ -112,7 +109,7 @@ def compare_reservation_times(reservation):
     # Get current time and start time of reservation + start time with interval
     start_time = datetime.strptime(reservation.start_time, "%H:%M").time().strftime("%H:%M")
     end_time = datetime.strptime(reservation.end_time, "%H:%M").time().strftime("%H:%M")
-    current_time_interval = (datetime.now() + timedelta(hours=INTERVAL)).time().strftime("%H:%M")
+    current_time_interval = (datetime.now() + timedelta(hours=interval_forward_hours)).time().strftime("%H:%M")
     current_time = datetime.now().time().strftime("%H:%M")
 
     start_ahead          =  current_time > start_time           # We have passed the start time      --C---S--------E--
@@ -120,13 +117,13 @@ def compare_reservation_times(reservation):
     interval_start_ahead =  current_time_interval > start_time  # Room is not booked within interval --C---I--S-----E--
     interval_end_behind  =  current_time_interval < end_time    # Room is booked within interval     --C-----S--I---E--
 
-    # If the booked time lies within [now, now+2h] return True
+    # If the booked time lies within [now, now + interval_hours] return True
     if ((start_ahead and end_behind) or (interval_start_ahead and interval_end_behind)):
         return True
     return False
 
 
-def __booked_percentage(building_name: str) -> float:
+def get_building_booked_percentage(building_name: str, interval_forward_hours: float) -> float:
     # Get all rooms of a building
     rooms = BuildingQuery(building_name).get_all_rooms_in_building()
     
@@ -137,12 +134,9 @@ def __booked_percentage(building_name: str) -> float:
     for r in rooms:
         if(not r.first_come_first_served):
             filtered_rooms += 1
-            if(is_room_booked(r.room_name)):
+            if(is_room_booked(r.room_name, interval_forward_hours)):
                 booked_rooms += 1
+
     # Loop over all rooms in a building
     percentage: float = booked_rooms / max(filtered_rooms, 1)
     return percentage
-
-def calculate_rgb_color(building_name : str):
-    inverted_percentage = 1 - __booked_percentage(building_name)
-    return [int(255 * inverted_percentage), int(255 * inverted_percentage), 0]

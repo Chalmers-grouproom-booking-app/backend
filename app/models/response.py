@@ -57,8 +57,7 @@ class BookedModel(BaseModel): ### Kanske ta bort och lägga i RoomModel!
     booked: bool
 
 class BuildingModel(BaseModel):
-    building_name: str
-    color: List[int]
+    booked_percentage: float
 
 class SearchModel(BaseModel):
     building: Optional[ List[ RoomModel] ] 

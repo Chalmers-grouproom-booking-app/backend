@@ -187,23 +187,23 @@ def test_get_room_booked_max_length_input():
     assert response.json() == {"detail": f"Input exceeds maximum length of {MAX_LENGTH} characters."}
     
 # Get building color tests
-def test_get_building_color():
-    response = client.get("/api/v1/building/color?input=Svea")
+def test_get_building_booked_percentage():
+    response = client.get("/api/v1/building/percentage?input=Svea")
     assert response.status_code == 200
     for building in response.json():
         assert validate_building_structure(building)
 
-def test_get_building_color_no_results():
-    response = client.get("/api/v1/building/color?input=nonexistent")
+def test_get_building_booked_percentage_no_results():
+    response = client.get("/api/v1/building/percentage?input=nonexistent")
     assert response.status_code == 404
     assert response.json() == {"detail": "No building found called 'nonexistent'"}
     
-def test_get_building_color_invalid_input():
-    response = client.get("/api/v1/building/color", params={"input": "#&!!**"})
+def test_get_building_booked_percentage_invalid_input():
+    response = client.get("/api/v1/building/percentage", params={"input": "#&!!**"})
     assert response.status_code == 422
     assert response.json() == {"detail": "Invalid input: #&!!**"}
     
-def test_get_building_color_max_length_input():
-    response = client.get("/api/v1/building/color?input=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+def test_get_building_booked_percentage_max_length_input():
+    response = client.get("/api/v1/building/percentage?input=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
     assert response.status_code == 422
     assert response.json() == {"detail": f"Input exceeds maximum length of {MAX_LENGTH} characters."}
