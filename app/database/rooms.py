@@ -139,7 +139,6 @@ def get_building_booked_percentage(building_name: str) -> float:
             filtered_rooms += 1
             if(is_room_booked(r.room_name)):
                 booked_rooms += 1
-                print(r.room_name)
 
     # Loop over all rooms in a building
     percentage: float = booked_rooms / max(filtered_rooms, 1)
