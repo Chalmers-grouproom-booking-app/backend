@@ -95,13 +95,13 @@ def is_room_booked(room_name: str) -> bool:
         return False
     
     for res in reservations:
-        if (compare_reservation_times(res) == True):
+        if (__compare_reservation_times(res) == True):
             return True
     return False
     
     
-def compare_reservation_times(reservation):
-    # The time-interval to be checked
+def __compare_reservation_times(reservation):
+    # The time-interval to be checked (hours)
     INTERVAL: int = 1
 
     # If the start date of reservation is not today return False
