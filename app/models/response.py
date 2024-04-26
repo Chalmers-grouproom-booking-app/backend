@@ -57,7 +57,6 @@ class BookedModel(BaseModel): ### Kanske ta bort och lägga i RoomModel!
     booked: bool
 
 class BuildingModel(BaseModel):
-    building_name: str
     booked_percentage: float
 
 class SearchModel(BaseModel):

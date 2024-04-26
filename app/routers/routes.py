@@ -78,6 +78,5 @@ async def get_building_percentage(building_name: str = Depends(validate_input)):
     if percentage == None:
         raise RoomNotFoundException('No building found')
     return [{
-        "building_name": building_name, 
         "booked_percentage": percentage
     }]
