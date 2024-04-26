@@ -126,7 +126,7 @@ def compare_reservation_times(reservation):
     return False
 
 
-def __booked_percentage(building_name: str) -> float:
+def get_building_booked_percentage(building_name: str) -> float:
     # Get all rooms of a building
     rooms = BuildingQuery(building_name).get_all_rooms_in_building()
     
@@ -139,10 +139,8 @@ def __booked_percentage(building_name: str) -> float:
             filtered_rooms += 1
             if(is_room_booked(r.room_name)):
                 booked_rooms += 1
+                print(r.room_name)
+
     # Loop over all rooms in a building
     percentage: float = booked_rooms / max(filtered_rooms, 1)
     return percentage
-
-def calculate_rgb_color(building_name : str):
-    inverted_percentage = 1 - __booked_percentage(building_name)
-    return [int(255 * inverted_percentage), int(255 * inverted_percentage), 0]

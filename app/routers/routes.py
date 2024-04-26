@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Query, HTTPException, status, Path, Response
 from typing import List, Optional
 from database.filter import search_filter
-from database.rooms import get_all_rooms, get_room_info, show_room_reservations, show_all_reservations, is_room_booked, calculate_rgb_color, get_room_id
+from database.rooms import get_all_rooms, get_room_info, show_room_reservations, show_all_reservations, is_room_booked, get_building_booked_percentage, get_room_id
 from models.response import ReservationModel, RoomModel, SearchModel, BookedModel, BuildingModel, RoomId
 from exceptions.exceptions import ErrorResponse
 from utils import validate_input
@@ -72,12 +72,12 @@ async def get_room_booked(room_name: str = Depends(validate_input)):
         raise RoomNotFoundException('No booking found')
     return booked
 
-@router.get("/building/color", response_model=List[BuildingModel], summary="Get building color", responses={404: {"model": ErrorResponse, "description": "No building found"}})
-async def get_rgb_color(building_name: str = Depends(validate_input)):
-    color = calculate_rgb_color(building_name)
-    if color == None:
+@router.get("/building/percentage", response_model=List[BuildingModel], summary="Get building booked percentage", responses={404: {"model": ErrorResponse, "description": "No building found"}})
+async def get_building_percentage(building_name: str = Depends(validate_input)):
+    percentage = get_building_booked_percentage(building_name)
+    if percentage == None:
         raise RoomNotFoundException('No building found')
     return [{
         "building_name": building_name, 
-        "color": color
+        "booked_percentage": percentage
     }]
