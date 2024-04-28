@@ -5,6 +5,10 @@ from typing import Optional
 class ErrorResponse(BaseModel):
     message: str
     code: Optional[int] = None
+    
+class MissingInputException(HTTPException):
+    def __init__(self, detail: str = "Missing input", code: int = 400):
+        super().__init__(status_code=code, detail=detail)
 
 class RoomsNotFoundException(HTTPException):
     def __init__(self, detail: str = "Rooms not found", code: int = 404):
@@ -19,3 +23,7 @@ class InvalidInputException(HTTPException):
 class ReservationsNotFoundException(HTTPException):
     def __init__(self, detail: str = "No reservations found", code: int = 404):
         super().__init__(status_code=code, detail=detail)  
+        
+class FastAPIParseError(HTTPException):
+    def __init__(self, detail: str = "Error parsing request", code: int = 400):
+        super().__init__(status_code=code, detail=detail)

@@ -5,6 +5,23 @@ import datetime
 class Login(BaseModel):
     login: str
 
+class ReviewModel(BaseModel):
+    room_name: str
+    review_score: float
+    review_text: Optional[str]
+    account_name: str
+    
+class ReviewOutput(BaseModel):
+    room_name: str
+    review_score: float
+    review_text: Optional[str]
+    account_name: str
+    review_id: int
+    date: str
+    
+class ReviewResponse(BaseModel):
+    message: str
+
 class RoomDetails(BaseModel):
     id: str
     created: datetime.datetime
