@@ -1,11 +1,11 @@
-from fastapi import APIRouter, Depends, Query, HTTPException, status, Path, Response
+from fastapi import APIRouter, Depends, Query
 from typing import Dict, List, Optional
 from database.filter import search_filter
-from database.reviews import create_review, delete_one_review, get_account_review, get_all_account_reviews, get_all_reviews_for_room, get_review_by_review_id, put_review
+from database.reviews import create_review, delete_one_review, get_account_review, get_all_account_reviews, get_all_reviews, get_all_reviews_for_room, get_review_by_review_id, put_review
 from database.rooms import get_all_rooms, get_room_info, show_room_reservations, show_all_reservations, is_room_booked, get_building_booked_percentage, get_room_id
-from models.response import ReservationModel, ReviewInput, ReviewOutput, ReviewResponse, RoomModel, SearchModel, BookedModel, BuildingModel, RoomId
+from models.response import ReservationModel, ReviewInput, ReviewOutput, ReviewResponse, ReviewScoreResponse, RoomModel, SearchModel, BookedModel, BuildingModel, RoomId
 from exceptions.exceptions import ErrorResponse, MissingInputException
-from utils import validate_input
+from utils import validate_float_input, validate_input, validate_integer_input
 from exceptions.exceptions import ErrorResponse, RoomsNotFoundException, RoomNotFoundException, ReservationsNotFoundException
 
 router = APIRouter(prefix="/api/v1")
@@ -114,8 +114,9 @@ async def get_review(room_name: str, account_name: str ):
     review = get_account_review(room_name, account_name)
     return review
 
-@router.get("/review/id", response_model=ReviewOutput, summary="Get review of a room by review id", responses={404: {"model": ErrorResponse, "description": "No review found"}})
+@router.get("/review/id", response_model=ReviewOutput, summary="Get review of a room by review id", responses={404: {"model": ErrorResponse, "description": "No review found"}, 422: {"model": ErrorResponse, "description": "Input must be a single integer"}})
 async def get_review_by_id(review_id: int):
+    validate_integer_input(review_id)
     review = get_review_by_review_id(review_id)
     return review
 
@@ -130,16 +131,31 @@ async def get_reviews(room_name: str = Depends(validate_input)):
     reviews = get_all_reviews_for_room(room_name)
     return reviews
 
+@router.get("/review/all", response_model=List[ReviewOutput], summary="Get all reviews", responses={404: {"model": ErrorResponse, "description": "No reviews found"}})
+async def get_reviews():
+    reviews = get_all_reviews()
+    return reviews
+
 @router.delete("/review/delete/one", response_model=ReviewResponse, summary="Delete a review of a room", responses={404: {"model": ErrorResponse, "description": "No reviews found"}})
 async def delete_review(review_id: int):
+    validate_integer_input(review_id)
     delete_one_review(review_id)
     return {"message": "Review successfully deleted"}
 
 @router.put("/review/update", response_model=ReviewResponse, summary="Update a review of a room", responses={404: {"model": ErrorResponse, "description": "No reviews found"}})
 async def update_review(review_id: int, review_score: float, review_text: str):
-    
+    validate_integer_input(review_id)
+    validate_float_input(review_score)
     put_review(review_id, review_score, review_text)
     return {"message": "Review successfully updated"}
+
+@router.get("/review/room/score", response_model=ReviewScoreResponse, summary="Get average review score of a room", responses={404: {"model": ErrorResponse, "description": "No reviews found"}})
+async def get_review_score(room_name: str = Depends(validate_input)):
+    reviews = get_all_reviews_for_room(room_name)
+    if not reviews:
+        raise RoomsNotFoundException()
+    score = sum([review.review_score for review in reviews]) / len(reviews)
+    return {"average_score": score}
 
 
 

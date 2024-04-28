@@ -12,6 +12,17 @@ def validate_input(input: str) -> str:
         raise InvalidInputException(f"Invalid input: {input}")
     return input
 
+def validate_integer_input(input: int) -> int:
+    # Check if input is of less than 20 characters
+    if len(str(input)) > MAX_LENGTH:
+        raise InvalidInputException(f"Input exceeds maximum length of {MAX_LENGTH} characters.")
+    return input
+
+def validate_float_input(input: float) -> float:
+    # Check if input is of less than 20 characters
+    if len(str(input)) > MAX_LENGTH:
+        raise InvalidInputException(f"Input exceeds maximum length of {MAX_LENGTH} characters.")
+    return input
 
 def validate_email(email: str):
     if not re.match(r"[^@]+@[^@]+\.[^@]+", email):

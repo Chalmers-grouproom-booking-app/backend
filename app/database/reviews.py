@@ -42,6 +42,21 @@ def get_all_reviews_for_room(room_name: str) -> list[ReviewOutput]:
         reviews.append(ReviewOutput(**review))
     return reviews
 
+def get_all_reviews() -> list[ReviewOutput]:
+    review_records = ReviewQuery.get_all_reviews()
+    reviews = []
+    for rev in review_records:
+        review = {
+            "room_name": RoomQuery._get_room_name_by_id( rev.room),
+            "review_score": rev.review_score,
+            "review_text": rev.review_text,
+            "account_name": rev.account_name,
+            "review_id": rev.review_id,
+            "date": rev.date   
+        }
+        reviews.append(ReviewOutput(**review))
+    return reviews
+
 def delete_one_review(review_id: int):
     ReviewQuery.delete_one_review(review_id)
     

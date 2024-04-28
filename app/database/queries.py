@@ -186,6 +186,14 @@ class ReviewQuery:
             raise RoomNotFoundException("No reviews found on this account")
         return review.items
     
+    @classmethod
+    def get_all_reviews(cls):
+        """Get all reviews"""
+        reviews = client.collection('reviews').get_full_list()
+        if len(reviews) == 0:
+            raise RoomNotFoundException("No reviews found")
+        return reviews
+    
     def get_all_reviews_for_room(self):
         """Get all reviews for a room"""
         # Check if room exists

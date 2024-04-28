@@ -21,6 +21,9 @@ class ReviewOutput(BaseModel):
     
 class ReviewResponse(BaseModel):
     message: str
+    
+class ReviewScoreResponse(BaseModel):
+    average_score: float
 
 class RoomDetails(BaseModel):
     id: str
