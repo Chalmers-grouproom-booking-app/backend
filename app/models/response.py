@@ -5,7 +5,7 @@ import datetime
 class Login(BaseModel):
     login: str
 
-class ReviewModel(BaseModel):
+class ReviewInput(BaseModel):
     room_name: str
     review_score: float
     review_text: Optional[str]

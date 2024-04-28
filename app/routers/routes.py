@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, Query, HTTPException, status, Path, Response
 from typing import Dict, List, Optional
 from database.filter import search_filter
-from database.reviews import create_review, get_account_review, get_all_account_reviews
+from database.reviews import create_review, delete_one_review, get_account_review, get_all_account_reviews, get_all_reviews_for_room, get_review_by_review_id, put_review
 from database.rooms import get_all_rooms, get_room_info, show_room_reservations, show_all_reservations, is_room_booked, get_building_booked_percentage, get_room_id
-from models.response import ReservationModel, ReviewModel, ReviewOutput, ReviewResponse, RoomModel, SearchModel, BookedModel, BuildingModel, RoomId
+from models.response import ReservationModel, ReviewInput, ReviewOutput, ReviewResponse, RoomModel, SearchModel, BookedModel, BuildingModel, RoomId
 from exceptions.exceptions import ErrorResponse, MissingInputException
 from utils import validate_input
 from exceptions.exceptions import ErrorResponse, RoomsNotFoundException, RoomNotFoundException, ReservationsNotFoundException
@@ -89,13 +89,16 @@ async def get_building_percentage(
     }]
     
 @router.post("/review/create", response_model=ReviewResponse, summary="Leave a review of a room", responses={422: {"model": ErrorResponse, "description": "Missing input"}})
-async def leave_review(review: ReviewModel):
+async def leave_review(review: ReviewInput):
 
-    required_fields = [field_name for field_name, field_type in ReviewModel.__annotations__.items() if field_type.__class__.__name__ == 'Type']
+    required_fields = [field_name for field_name, field_type in ReviewInput.__annotations__.items() if field_type.__class__.__name__ == 'Type']
 
     if any(field not in review.dict() for field in required_fields):
         raise MissingInputException("Missing input. Please provide room, review score, and account ID.")
 
+    if review.review_text is None:
+        review.review_text = ""
+    
     filters = {k: v for k, v in review.dict().items() if v is not None and (k != "review_text" and k != "review_score")}
     for key, value in filters.items():
         validate_input(value)  # Apply validation to each filter
@@ -103,7 +106,7 @@ async def leave_review(review: ReviewModel):
     create_review(review.room_name, review.review_score, review.account_name, review.review_text)
     return {"message": "Review successfully submitted"}
 
-@router.get("/review/one", response_model=ReviewOutput, summary="Get review of a room", responses={404: {"model": ErrorResponse, "description": "No reviews found"}})
+@router.get("/review/account", response_model=ReviewOutput, summary="Get review of a room from given account", responses={404: {"model": ErrorResponse, "description": "No review found"}})
 async def get_review(room_name: str, account_name: str ):
     inputs  = [room_name, account_name]
     for input in inputs:
@@ -111,9 +114,32 @@ async def get_review(room_name: str, account_name: str ):
     review = get_account_review(room_name, account_name)
     return review
 
-@router.get("/review/all", response_model=List[ReviewOutput], summary="Get all reviews of a room", responses={404: {"model": ErrorResponse, "description": "No reviews found"}})
+@router.get("/review/id", response_model=ReviewOutput, summary="Get review of a room by review id", responses={404: {"model": ErrorResponse, "description": "No review found"}})
+async def get_review_by_id(review_id: int):
+    review = get_review_by_review_id(review_id)
+    return review
+
+@router.get("/review/account/all", response_model=List[ReviewOutput], summary="Get all reviews made by given account", responses={404: {"model": ErrorResponse, "description": "No reviews found"}, 422: {"model": ErrorResponse, "description": "Input must be a single integer"}})
 async def get_reviews(account_name: str):
     validate_input(account_name)
     reviews = get_all_account_reviews(account_name)
     return reviews
+
+@router.get("/review/room/all", response_model=List[ReviewOutput], summary="Get all reviewsmade for given room", responses={404: {"model": ErrorResponse, "description": "No reviews found"}})
+async def get_reviews(room_name: str = Depends(validate_input)):
+    reviews = get_all_reviews_for_room(room_name)
+    return reviews
+
+@router.delete("/review/delete/one", response_model=ReviewResponse, summary="Delete a review of a room", responses={404: {"model": ErrorResponse, "description": "No reviews found"}})
+async def delete_review(review_id: int):
+    delete_one_review(review_id)
+    return {"message": "Review successfully deleted"}
+
+@router.put("/review/update", response_model=ReviewResponse, summary="Update a review of a room", responses={404: {"model": ErrorResponse, "description": "No reviews found"}})
+async def update_review(review_id: int, review_score: float, review_text: str):
+    
+    put_review(review_id, review_score, review_text)
+    return {"message": "Review successfully updated"}
+
+
 
