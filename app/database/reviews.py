@@ -1,6 +1,7 @@
 from app.models.response import ReviewOutput
 from database.pb import client
-from database.queries import ReviewQuery, RoomQuery
+from database.queries.review_query import ReviewQuery
+from database.queries.room_query import RoomQuery
 
 def create_review(room_name: str, review_score: float, account_name: str, review_text: str):
     ReviewQuery(room_name).create_review(review_score, account_name, review_text)

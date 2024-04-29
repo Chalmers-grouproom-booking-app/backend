@@ -9,7 +9,8 @@ import uvicorn
 
 load_dotenv()
 
-from routers import routes
+from routers import review_routes
+from routers import room_routes
 from routers import timeedit_routes
 
 origins = []
@@ -18,7 +19,8 @@ scheduler = BackgroundScheduler()
 
 app = FastAPI()
 
-app.include_router(routes.router)
+app.include_router(room_routes.router)
+app.include_router(review_routes.router)
 app.include_router(timeedit_routes.router)
 
 app.add_middleware(

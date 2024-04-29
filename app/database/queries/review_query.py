@@ -1,85 +1,12 @@
 from app.automatisation.auto_get_reservations import fetch_group_room_id
-from app.models.response import ReviewInput, ReviewOutput
+from app.models.response import ReviewOutput
+from app.database.queries.room_query import RoomQuery
 from exceptions.exceptions import FastAPIParseError, InvalidInputException, RoomNotFoundException
 from database.pb import client
 from datetime import datetime
-from datetime import timedelta
 import random
 import re
 
-class RoomQuery:
-    """Handles queries related to a specific room."""
-    MAX_RESERVATIONS = 50
-
-    def __init__(self, room_name: str):
-        """Initialize with the name of the room to query."""
-        self.room_name = room_name
-        self.room_filter = f'room_name="{self.room_name}"'
-
-    def _get_room_record(self):
-        """Fetch the room record from the database."""
-        fetch = client.collection('grouprooms').get_list(1, 1, {'filter': self.room_filter})
-        if fetch.total_items == 0:
-            raise RoomNotFoundException(f"Room '{self.room_name}' not found.")
-        return fetch.items[0]
-    
-    @classmethod
-    def _get_room_record_by_id(cls, id: str):
-        """Fetch the room record from the database."""
-        fetch = client.collection('grouprooms').get_list(1, 1, {'filter': f'id="{id}"'})
-        if fetch.total_items == 0:
-            raise RoomNotFoundException(f"The id '{id}' does not correspond to a room.")
-        return fetch.items[0]
-    
-    @classmethod
-    def _get_room_name_by_id(cls, id: str):
-        return cls._get_room_record_by_id(id).room_name
-
-    def get_building(self):
-        """Return the building name for the room."""
-        return self._get_room_record().building
-
-    def get_reservations(self):
-        """Return the reservation records for the room."""
-        fetch = client.collection('grouprooms').get_list(1, 1, {'filter': self.room_filter})
-        if fetch.total_items == 0:
-            raise RoomNotFoundException(f"Room '{self.room_name}' not found.")
-        reservation_filter = f"room.room_name='{self.room_name}'"
-        return client.collection('reservations').get_list(1, self.MAX_RESERVATIONS, {'filter': reservation_filter}).items
-
-    def get_room(self):
-        """Return the  record."""
-        return self._get_room_record()
-    
-    def get_room_id(self):
-        """Return the room ID."""
-        return self._get_room_record().room_id
-    
-    def get_room_item_id(self):
-        """Return the room item ID."""
-        return self._get_room_record().id
-    
-    @classmethod
-    def get_all_rooms(cls):
-        """Return all rooms in the database."""
-        return client.collection('grouprooms').get_full_list()
-    
-    
-
-class BuildingQuery:
-    MAX_RESERVATIONS = 50
-
-    def __init__(self, building: str):
-        self.building = building
-        
-    def get_all_rooms_in_building(self):
-        """Return all rooms in a building"""
-        reservation_filter = f"building='{self.building}'"
-        rooms = client.collection('grouprooms').get_list(1, self.MAX_RESERVATIONS, {'filter': reservation_filter}).items
-        if not rooms:
-            raise RoomNotFoundException(f"No building found called '{self.building}'")
-        return rooms
-    
 class ReviewQuery:
     
     MAX_REVIEWS = 50
@@ -232,6 +159,5 @@ class ReviewQuery:
             "review_id": review_id,
             "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         })
-        
         
         
