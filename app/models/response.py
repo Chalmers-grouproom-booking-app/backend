@@ -19,6 +19,19 @@ class ReviewOutput(BaseModel):
     review_id: int
     date: str
     
+"""
+class ReviewInput(BaseModel):
+    room_name: str
+    review_score: float
+    review_text: Optional[str]
+    
+class ReviewOutput ( ReviewInput ):
+    display_name: str
+    review_id : int
+    created: datetime.datetime
+    
+"""
+    
 class ReviewResponse(BaseModel):
     message: str
     
