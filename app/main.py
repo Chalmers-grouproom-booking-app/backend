@@ -12,6 +12,7 @@ load_dotenv()
 from routers import review_routes
 from routers import room_routes
 from routers import timeedit_routes
+from routers import account
 
 origins = []
 
@@ -22,6 +23,7 @@ app = FastAPI()
 app.include_router(room_routes.router)
 app.include_router(review_routes.router)
 app.include_router(timeedit_routes.router)
+app.include_router(account.router)
 
 app.add_middleware(
     CORSMiddleware,

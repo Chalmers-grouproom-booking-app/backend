@@ -10,14 +10,11 @@ from utils import validate_email, validate_password
 router = APIRouter(prefix="/timedit/api", tags=["Timedit API"])
 
 def parse_cookies(cookies_str: str):
-    try:
-        cookies_str = cookies_str.replace('\\"', '"')
-        cookies = json.loads(cookies_str)
-        if not isinstance(cookies, dict):
-            raise ValueError("Invalid cookie format")
-        return cookies
-    except (json.JSONDecodeError, ValueError) as e:
-        raise HTTPException(status_code=400, detail="Invalid cookie data") from e
+    cookies_str = cookies_str.replace('\\"', '"')
+    cookies = json.loads(cookies_str)
+    if not isinstance(cookies, dict):
+        raise ValueError("Invalid cookie format")
+    return cookies
 
 @router.post("/login", response_model=Login, responses={400: {"model": ErrorResponse}}, summary="Login to TimeEdit")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
