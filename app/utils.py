@@ -28,6 +28,14 @@ def test_encryption_key():
     print("Encryption key is valid.")
     return True
 
+def format_cid_username(username):
+    if not re.match(r'^[\w.-]+(@[a-zA-Z\d.-]*\.[a-zA-Z]{2,})?$', username):
+        return None
+    match = re.match(r'^([\w.-]+)(@)?', username)
+    if match:
+        return f"{match.group(1)}@net.chalmers.se"
+    else:
+        return None
 
 MAX_LENGTH = 20
 def validate_input(input: str) -> str:

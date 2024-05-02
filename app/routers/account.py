@@ -3,7 +3,8 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
 
 from app.automatisation.timeedit_api import TimeEditAPI
-from database.accounts import AccountPB, AccountNotFoundError, AccountCreationError, InvalidDataError
+from database.accounts import AccountPB, AccountNotFoundError
+from utils import format_cid_username
 from hashlib import sha256
 
 router = APIRouter(prefix="/account", tags=["Account"])
@@ -36,13 +37,24 @@ def get_user_by_token(token: str) -> User:
         )
 
 async def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
-    return get_user_by_token(token)
+    user = get_user_by_token(token)
+    timeedit_test = False
+    try:
+        timeedit_test = TimeEditAPI(cookies=user.cookies).test()
+    except:
+        timeedit_test = False
+    if (not timeedit_test):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid TimeEdit session",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return user
 
 @router.get("/me")
 async def read_users_me(current_user: User = Depends(get_current_user)) -> User:
     return current_user
 
-# make router to update account display name
 @router.put("/display_name")
 async def update_display_name(display_name: str, current_user: User = Depends(get_current_user)):
     try:
@@ -60,7 +72,12 @@ async def update_display_name(display_name: str, current_user: User = Depends(ge
 
 @router.post("/token")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    email, password = form_data.username, form_data.password
+    email = format_cid_username( form_data.username )
+    password = form_data.password
+    print(f"Logging in with email: {email}")
+    print(f"Logging in with password: {password}")
+    if (not email or not password):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid email or password")
     token = generate_token(email, password)
     try:
         timeedit = TimeEditAPI(email, password)
@@ -76,4 +93,16 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         return {"access_token": token, "token_type": "bearer"}
     except Exception as e:
         print(f"Login failed: {e}")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
+@router.delete("/token")
+async def logout(current_user: User = Depends(get_current_user)):
+    try:
+        account = AccountPB.get_account(current_user.token)
+        account.update_account(cookies={})
+        return {"message": "Logged out"}
+    except AccountNotFoundError:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Account not found")
+    except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
