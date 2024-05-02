@@ -22,8 +22,8 @@ class User(BaseModel):
 class DisplayNameUpdate(BaseModel):
     display_name: str = Field(..., min_length=1)
 
-def generate_token(email: str, password: str) -> str:
-    return sha256(f'{email}{password}'.encode()).hexdigest()
+def generate_token(email: str) -> str:
+    return sha256(f'{email}'.encode()).hexdigest()
 
 def get_user_by_token(token: str) -> User:
     account = AccountPB.get_account(token)
@@ -84,7 +84,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
             detail=str(e)
         ) from e
 
-    token = generate_token(email, password)
+    token = generate_token(email)
     try:
         user = AccountPB.get_or_create_account(token, email, cookies=cookies)
     except AccountCreationError as e:
