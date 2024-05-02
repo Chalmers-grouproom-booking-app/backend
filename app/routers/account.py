@@ -13,6 +13,7 @@ router = APIRouter(prefix="/account", tags=["Account"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/account/token")
 
 class User(BaseModel):
+    id: str
     token: str
     email: str
     display_name: str
@@ -32,6 +33,7 @@ def get_user_by_token(token: str) -> User:
             detail="Invalid authentication token",
         )
     return User(
+        id = account.id,
         token=account.token,
         email=account.email,
         display_name=account.display_name,
@@ -76,7 +78,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     try:
         timeedit = TimeEditAPI(email, password)
         cookies = timeedit.get_cookies()
-    except Exception as e:  # Consider catching a more specific exception if possible
+    except Exception as e:  
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=str(e)
@@ -98,7 +100,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 async def logout(current_user: User = Depends(get_current_user)):
     try:
         account = AccountPB.get_account(current_user.token)
-        account.update_account(cookies={})  # This sets the cookies to an empty dictionary, signaling a logout.
+        account.update_account(cookies={})  
         return {"message": "Logged out successfully."}
     except AccountNotFoundError:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Account not found")

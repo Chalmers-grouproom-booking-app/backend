@@ -7,31 +7,16 @@ class Login(BaseModel):
 
 class ReviewInput(BaseModel):
     room_name: str
-    review_score: float
+    review_score: float | int
     review_text: Optional[str]
-    account_name: str
     
-class ReviewOutput(BaseModel):
+class ReviewOutput( ReviewInput ):
     room_name: str
-    review_score: float
-    review_text: Optional[str]
-    account_name: str
-    review_id: int
-    date: str
-    
-"""
-class ReviewInput(BaseModel):
-    room_name: str
-    review_score: float
-    review_text: Optional[str]
-    
-class ReviewOutput ( ReviewInput ):
-    display_name: str
-    review_id : int
+    account_display_name: str
     created: datetime.datetime
+    updated: datetime.datetime
     
-"""
-    
+
 class ReviewResponse(BaseModel):
     message: str
     

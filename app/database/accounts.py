@@ -87,6 +87,8 @@ class AccountPB:
     def get_or_create_account(cls, token, email, **kwargs):
         try:
             account = cls.get_account(token)
+            if( kwargs.get('cookies') ):
+                account.update_account(cookies=kwargs.get('cookies'))
         except AccountNotFoundError:
             account = cls.create_account(token, email, **kwargs)
         return account

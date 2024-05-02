@@ -22,7 +22,8 @@ app = FastAPI()
 test_encryption_key()
 
 app.include_router(room_routes.router)
-app.include_router(review_routes.router)
+app.include_router(review_routes.public_router)
+app.include_router(review_routes.private_router)
 app.include_router(timeedit_routes.router)
 app.include_router(account.router)
 
