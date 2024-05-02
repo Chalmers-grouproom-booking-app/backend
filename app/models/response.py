@@ -99,3 +99,9 @@ class SearchModel(BaseModel):
     floor_level: Optional[  List[ RoomModel ] ] 
     first_come_first_served: Optional[  List[ RoomModel ] ] 
     
+    
+class Account(BaseModel):
+    token : str
+    email : str
+    display_name : str
+    timeedit_cookies : str | None = None
