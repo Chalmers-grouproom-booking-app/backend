@@ -3,8 +3,8 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel, Field
 from typing import Optional
 
-from app.automatisation.timeedit_api import TimeEditAPI
-from app.exceptions.exceptions import AccountCreationError, AccountNotFoundError
+from automatisation.timeedit_api import TimeEditAPI
+from exceptions.exceptions import AccountCreationError, AccountNotFoundError
 from database.accounts import AccountPB 
 from utils import format_cid_username
 from hashlib import sha256

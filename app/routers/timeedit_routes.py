@@ -1,13 +1,8 @@
-from fastapi import APIRouter, HTTPException, Header, Depends
-from fastapi.responses import JSONResponse
-from fastapi.security import OAuth2PasswordRequestForm
-from app.routers.account import User, get_current_user
+from fastapi import APIRouter, HTTPException, Depends
+from routers.account import User, get_current_user
 from automatisation.timeedit_api import TimeEditAPI
 from exceptions.exceptions import ErrorResponse, AccountNotFoundError
-from models.timeedit import Login, AllReservations
-from utils import validate_email, validate_password
-
-from database.accounts import AccountPB
+from models.timeedit import  AllReservations
 
 router = APIRouter(prefix="/timedit/api", tags=["Timedit API"])
 
