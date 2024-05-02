@@ -1,5 +1,4 @@
-from app.models.response import ReviewOutput
-from database.pb import client
+from models.response import ReviewOutput
 from database.queries.review_query import ReviewQuery
 from database.queries.room_query import RoomQuery
 from database.queries.account_querey import AccountQuery

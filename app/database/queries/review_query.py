@@ -1,13 +1,8 @@
-from typing import Optional
-from app.automatisation.auto_get_reservations import fetch_group_room_id
-from app.database.queries.account_querey import AccountQuery
-from app.models.response import ReviewOutput
-from app.database.queries.room_query import RoomQuery
-from exceptions.exceptions import FastAPIParseError, InvalidInputException, RoomNotFoundException
+from database.queries.account_querey import AccountQuery
+from models.response import ReviewOutput
+from database.queries.room_query import RoomQuery
+from exceptions.exceptions import  InvalidInputException, RoomNotFoundException
 from database.pb import client
-from datetime import datetime
-import random
-import re
 
 class ReviewQuery:
     
