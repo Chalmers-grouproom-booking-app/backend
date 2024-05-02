@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from typing import List
-from app.utils import validate_float_input, validate_input, validate_integer_input
+from utils import validate_float_input, validate_input, validate_integer_input
 from database.reviews import create_review, delete_one_review, get_account_review, get_all_account_reviews, get_all_reviews, get_all_reviews_for_room, get_review_by_review_id, put_review
 from models.response import ReviewInput, ReviewOutput, ReviewResponse, ReviewScoreResponse
 from exceptions.exceptions import ErrorResponse, RoomsNotFoundException
