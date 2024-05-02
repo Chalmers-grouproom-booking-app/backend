@@ -31,3 +31,12 @@ class ReservationsNotFoundException(HTTPException):
 class FastAPIParseError(HTTPException):
     def __init__(self, detail: str = "Error parsing request", code: int = 400):
         super().__init__(status_code=code, detail=detail)
+
+class AccountNotFoundError(Exception):
+    pass
+
+class AccountCreationError(Exception):
+    pass
+
+class InvalidDataError(Exception):
+    pass

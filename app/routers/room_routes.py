@@ -7,7 +7,7 @@ from exceptions.exceptions import ErrorResponse
 from utils import validate_input
 from exceptions.exceptions import ErrorResponse, RoomsNotFoundException, RoomNotFoundException, ReservationsNotFoundException
 
-router = APIRouter(prefix="/api/v1")
+router = APIRouter(prefix="/api/v1", tags=["Room API"])
 
 @router.get("/all_rooms", response_model=List[RoomModel], summary="Get all rooms from database", responses={404: {"model": ErrorResponse, "description": "Rooms not found"}})
 async def get_all_rooms_info():
