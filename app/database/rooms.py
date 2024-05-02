@@ -1,6 +1,7 @@
 from typing import List
 from models.response import ReservationModel, RoomModel, SearchModel
-from database.queries import RoomQuery, BuildingQuery
+from database.queries.room_query import RoomQuery
+from database.queries.building_query import BuildingQuery
 from datetime import datetime
 from datetime import timedelta
 import re

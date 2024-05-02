@@ -5,6 +5,24 @@ import datetime
 class Login(BaseModel):
     login: str
 
+class ReviewInput(BaseModel):
+    room_name: str
+    review_score: float | int
+    review_text: Optional[str]
+    
+class ReviewOutput( ReviewInput ):
+    room_name: str
+    account_display_name: str
+    created: datetime.datetime
+    updated: datetime.datetime
+    
+
+class ReviewResponse(BaseModel):
+    message: str
+    
+class ReviewScoreResponse(BaseModel):
+    average_score: float
+
 class RoomDetails(BaseModel):
     id: str
     created: datetime.datetime
@@ -66,3 +84,9 @@ class SearchModel(BaseModel):
     floor_level: Optional[  List[ RoomModel ] ] 
     first_come_first_served: Optional[  List[ RoomModel ] ] 
     
+    
+class Account(BaseModel):
+    token : str
+    email : str
+    display_name : str
+    timeedit_cookies : str | None = None

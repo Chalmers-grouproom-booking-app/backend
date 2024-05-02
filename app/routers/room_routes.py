@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query, HTTPException, status, Path, Response
+from fastapi import APIRouter, Depends, Query
 from typing import List, Optional
 from database.filter import search_filter
 from database.rooms import get_all_rooms, get_room_info, show_room_reservations, show_all_reservations, is_room_booked, get_building_booked_percentage, get_room_id
@@ -7,7 +7,7 @@ from exceptions.exceptions import ErrorResponse
 from utils import validate_input
 from exceptions.exceptions import ErrorResponse, RoomsNotFoundException, RoomNotFoundException, ReservationsNotFoundException
 
-router = APIRouter(prefix="/api/v1")
+router = APIRouter(prefix="/api/v1", tags=["Room API"])
 
 @router.get("/all_rooms", response_model=List[RoomModel], summary="Get all rooms from database", responses={404: {"model": ErrorResponse, "description": "Rooms not found"}})
 async def get_all_rooms_info():
@@ -86,3 +86,6 @@ async def get_building_percentage(
     return [{
         "booked_percentage": percentage
     }]
+
+
+

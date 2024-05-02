@@ -1,25 +1,31 @@
-from fastapi import FastAPI, status,Request 
+from fastapi import FastAPI, status,Request
 from fastapi.middleware.cors import CORSMiddleware
 from apscheduler.schedulers.background import BackgroundScheduler
 from fastapi.responses import JSONResponse, HTMLResponse
 from automatisation.auto_get_reservations import fetch_reservations
 from dotenv import load_dotenv
+from utils import test_encryption_key
 import os
 import uvicorn
 
 load_dotenv()
 
-from routers import routes
+from routers import review_routes
+from routers import room_routes
 from routers import timeedit_routes
+from routers import account
 
 origins = []
 
 scheduler = BackgroundScheduler()
-
 app = FastAPI()
+test_encryption_key()
 
-app.include_router(routes.router)
+app.include_router(room_routes.router)
+app.include_router(review_routes.public_router)
+app.include_router(review_routes.private_router)
 app.include_router(timeedit_routes.router)
+app.include_router(account.router)
 
 app.add_middleware(
     CORSMiddleware,
