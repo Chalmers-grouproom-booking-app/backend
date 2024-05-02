@@ -82,7 +82,7 @@ class TimeEditAPI:
             if error_message:
                 error = error_message
         if error:
-            error = "❌ Login failed with CID, " + error
+            error = "❌ Login failed, " + error
             raise Exception(error)
         else:
             print( "🔗 Redirecting to TimeEdit")

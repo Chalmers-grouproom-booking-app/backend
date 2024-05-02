@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 from typing import Optional
 
 from app.automatisation.timeedit_api import TimeEditAPI
-from app.exceptions.exceptions import AccountNotFoundError
+from app.exceptions.exceptions import AccountCreationError, AccountNotFoundError
 from database.accounts import AccountPB 
 from utils import format_cid_username
 from hashlib import sha256
@@ -64,15 +64,34 @@ async def update_display_name(update: DisplayNameUpdate, current_user: User = De
     account.update_account(display_name=update.display_name)
     return {"message": "Display name updated successfully"}
 
+from fastapi import HTTPException, status
+
 @router.post("/token")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     email = format_cid_username(form_data.username)
     if not email:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid email")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid email format or missing email.")
     password = form_data.password
+
+    try:
+        timeedit = TimeEditAPI(email, password)
+        cookies = timeedit.get_cookies()
+    except Exception as e:  # Consider catching a more specific exception if possible
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=str(e)
+        ) from e
+
     token = generate_token(email, password)
-    cookies = TimeEditAPI(email, password).get_cookies()
-    user = AccountPB.get_or_create_account(token, email, cookies=cookies)
+    try:
+        user = AccountPB.get_or_create_account(token, email, cookies=cookies)
+    except AccountCreationError as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Account creation failed: {str(e)}")
+    except AccountNotFoundError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Account not found: {str(e)}")
+    except Exception as e:  # Catch any other unexpected exceptions
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"An unexpected error occurred: {str(e)}")
+
     return {"access_token": token, "token_type": "bearer"}
 
 @router.delete("/token")
