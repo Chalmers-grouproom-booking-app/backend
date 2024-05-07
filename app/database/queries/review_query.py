@@ -30,7 +30,7 @@ class ReviewQuery:
     def _get_review_review_id(self, account_name: str):
         return self._get_review_record(account_name).review_id
     
-    def _get_review_item_by_id(self, review_id: int):
+    def _get_review_item_by_id(self, review_id: str):
         review_filter = f'id="{review_id}"'
         review = client.collection('reviews').get_list(1, 1, {'filter': review_filter})
         if review.total_items == 0:
@@ -112,7 +112,7 @@ class ReviewQuery:
         return reviews.items
     
     @classmethod
-    def delete_one_review(cls, review_id: int):
+    def delete_one_review(cls, review_id: str):
         """Delete a review"""
         review = ReviewQuery()._get_review_item_by_id(review_id)
         client.collection('reviews').delete(review.id)

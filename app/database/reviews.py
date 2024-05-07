@@ -57,7 +57,7 @@ def get_all_reviews() -> list[ReviewOutput]:
         for record in ReviewQuery.get_all_reviews()
     ]
 
-def delete_one_review(review_id: int):
+def delete_one_review(review_id: str):
     ReviewQuery.delete_one_review(review_id)
     
 def put_review(review_id: str, review_score: float | int, review_text: str) -> ReviewOutput:

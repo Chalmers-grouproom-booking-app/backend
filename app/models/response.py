@@ -11,7 +11,7 @@ class ReviewInput(BaseModel):
     review_text: Optional[str]
     
 class ReviewOutput( ReviewInput ):
-    room_name: str
+    id: str
     account_display_name: str
     created: datetime.datetime
     updated: datetime.datetime
