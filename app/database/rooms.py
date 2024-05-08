@@ -141,3 +141,9 @@ def get_building_booked_percentage(building_name: str, interval_forward_hours: f
     # Loop over all rooms in a building
     percentage: float = booked_rooms / max(filtered_rooms, 1)
     return percentage
+
+def building_contains_no_bookable_rooms(building_name) -> bool:
+    rooms = BuildingQuery(building_name).get_all_rooms_in_building()
+    if(len(rooms) == 0):
+        return True
+    return False

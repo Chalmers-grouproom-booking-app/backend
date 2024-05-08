@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Query
 from typing import List, Optional
 from database.filter import search_filter
-from database.rooms import get_all_rooms, get_room_info, show_room_reservations, show_all_reservations, is_room_booked, get_building_booked_percentage, get_room_id
+from database.rooms import get_all_rooms, get_room_info, show_room_reservations, show_all_reservations, is_room_booked, get_building_booked_percentage, get_room_id, building_contains_no_bookable_rooms
 from models.response import ReservationModel, RoomModel, SearchModel, BookedModel, BuildingModel, RoomId
 from exceptions.exceptions import ErrorResponse
 from utils import validate_input
@@ -80,12 +80,18 @@ async def get_building_percentage(
     building_name: str = Depends(validate_input), 
     interval_forward_hours: float = Query(0.5, description="Hours forward interval")
 ):
+    
+    if(building_contains_no_bookable_rooms(building_name)):
+        return -1
+    
     percentage = get_building_booked_percentage(building_name, interval_forward_hours)
-    if(percentage == 0):
-        percentage = 0.001
+
+    #if(percentage == 0):
+    #    percentage = 0.001
     if percentage == None:
         raise RoomNotFoundException('No building found')
-    return percentage#[{
-        #"booked_percentage": percentage
+    return percentage
+    #[{
+    #"booked_percentage": percentage
     #}]
 
