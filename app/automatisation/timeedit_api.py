@@ -198,6 +198,9 @@ class TimeEditAPI:
         if response.status_code == 200:
             print(f"Reservation edited | id:{reservation_id}")
             return response
+        error_message = response.text
+        if(error_message and len(error_message) > 0 and len(error_message) < 100):
+            raise Exception(error_message)
         raise Exception("Failed to edit reservation")
         
 if __name__ == "__main__":
