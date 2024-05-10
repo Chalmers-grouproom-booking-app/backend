@@ -5,6 +5,7 @@ from models.response import ReviewOutput
 from typing import Dict, Any
 from utils import MAX_LENGTH
 import os
+
 from dotenv import load_dotenv, dotenv_values 
 load_dotenv() 
 
@@ -15,17 +16,18 @@ def client():
     with TestClient(app) as c:
       yield c
 
+@pytest.fixture(scope="module")
 def test_user():
-    return {"username": f"{os.getenv("CID_USERNAME")}", "password": f"{os.getenv("CID_PASSWORD")}"}
+    return {"username": os.getenv("CID_USERNAME"), "password": os.getenv("CID_PASSWORD")}
 
-def test_login(client):
-    response = client.post("/account/token", data=test_user())
+def test_login(client, test_user):  # Pass test_user as an argument
+    response = client.post("/account/token", data=test_user)  # Pass the obtained dictionary to data parameter
     assert response.status_code == 200
     token = response.json()["access_token"]
     return token  # Return only the token
 
-def get_test_review_id(client):
-    token = test_login(client)
+def get_test_review_id(client, test_user):
+    token = test_login(client, test_user)
     response = client.get("/review/api/my-room-review?room_name=SB-G501", headers={"Authorization": f"Bearer {token}"})
     return response.json()["id"]
 
@@ -37,8 +39,8 @@ def validate_review_structure(review: Dict[str, Any]) -> bool:
         return False
 
 # create review tests
-def test_create_review(client):  # Modified here
-    token = test_login(client)
+def test_create_review(client, test_user):  # Modified here
+    token = test_login(client, test_user)
     response = client.post("/review/api/create-review", json={"room_name": "SB-G501", "review_score": 4, "review_text": "This is for testing purposes"}, headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 200
     assert response.json() == {'message': 'Review successfully submitted'}
@@ -96,34 +98,34 @@ def test_get_average_room_review_score_max_length(client):  # Modified here
     assert response.json() == {"detail": f"Input exceeds maximum length of {MAX_LENGTH} characters."}
 
 # Get my review for room tests
-def test_get_my_review_for_room(client):
-    token = test_login(client)
+def test_get_my_review_for_room(client, test_user):
+    token = test_login(client, test_user)
     response = client.get("/review/api/my-room-review?room_name=SB-G501", headers={"Authorization": f"Bearer {token}"})
     TEST_REVIEW_ID = response.json()["id"]
     assert response.status_code == 200
     assert validate_review_structure(response.json())
     
-def test_get_my_review_for_nonexistent_room(client):
-    token = test_login(client)
+def test_get_my_review_for_nonexistent_room(client, test_user):
+    token = test_login(client, test_user)
     response = client.get("/review/api/my-room-review?room_name=nonexistent", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 404
     assert response.json() == {"detail": "Room 'nonexistent' not found."}
 
-def test_get_my_review_for_room_invalid_input(client):
-    token = test_login(client)
+def test_get_my_review_for_room_invalid_input(client, test_user):
+    token = test_login(client, test_user)
     response = client.get("/review/api/my-room-review", params={"room_name": "#&!!**"}, headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 422
     assert response.json() == {"detail": "Invalid input: #&!!**"}
 
-def test_get_my_review_for_room_max_length(client):
-    token = test_login(client)
+def test_get_my_review_for_room_max_length(client, test_user):
+    token = test_login(client, test_user)
     response = client.get("/review/api/my-room-review?room_name=" + "a" * (MAX_LENGTH + 1), headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 422
     assert response.json() == {"detail": f"Input exceeds maximum length of {MAX_LENGTH} characters."}
     
 # Get my reviews tests
-def test_get_my_reviews(client):
-    token = test_login(client)
+def test_get_my_reviews(client, test_user):
+    token = test_login(client, test_user)
     response = client.get("/review/api/my-reviews", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 200
     reviews = response.json()
@@ -131,37 +133,38 @@ def test_get_my_reviews(client):
         assert validate_review_structure(review)
 
 # Update review tests
-def test_update_review(client):
-    token = test_login(client)
-    review = get_test_review_id(client)
+def test_update_review(client, test_user):
+    token = test_login(client, test_user)
+    review = get_test_review_id(client, test_user)
     response = client.put(f"/review/api/update-review/{review}", params={"review_score": 5, "review_text": "This is for testing purposes"}, headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 200
     assert response.json() == {'message': 'Review successfully updated'}
 
 # Delete review tests
-def test_delete_review(client):
-    token = test_login(client)
-    review = get_test_review_id(client)
+def test_delete_review(client, test_user):
+    token = test_login(client, test_user)
+    review = get_test_review_id(client, test_user)
     response = client.delete(f"/review/api/delete-review/{review}?review_score=5", params={'review_text': 'This text had been changed'},  headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 200
     assert response.json() == {'message': 'Review successfully deleted'}
     
-def test_delete_nonexistent_review(client):
-    token = test_login(client)
+def test_delete_nonexistent_review(client, test_user):
+    token = test_login(client, test_user)
     response = client.delete("/review/api/delete-review/nonexistent", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 404
     assert response.json() == {'detail': "No review found with review ID 'nonexistent'"}
 
-def test_delete_review_invalid_input(client):
-    token = test_login(client)
+def test_delete_review_invalid_input(client, test_user):
+    token = test_login(client, test_user)
     response = client.delete("/review/api/delete-review/%20%23%26%21%21%2A%2A" , headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 422
     assert response.json() == {'detail': 'Invalid input:  #&!!**'}
     
-def test_delete_review_max_length(client):
-    token = test_login(client)
+def test_delete_review_max_length(client, test_user):
+    token = test_login(client, test_user)
     response = client.delete("/review/api/delete-review/" + "a" * (MAX_LENGTH + 1), headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 422
     assert response.json() == {"detail": f"Input exceeds maximum length of {MAX_LENGTH} characters."}
+    
     
     
