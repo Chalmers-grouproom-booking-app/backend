@@ -37,11 +37,11 @@ def format_cid_username(username):
     else:
         return None
 
-MAX_LENGTH = 20
+MAX_LENGTH = 25
 def validate_input(input: str) -> str:
     if input == '':
         return input
-    if len(input) > 20:
+    if len(input) > MAX_LENGTH:
         raise InvalidInputException(f"Input exceeds maximum length of {MAX_LENGTH} characters.")
     if not re.match(r"^[a-zA-Z0-9\s_\-,åÅäÄöÖ]*$", input):
         raise InvalidInputException(f"Invalid input: {input}")
