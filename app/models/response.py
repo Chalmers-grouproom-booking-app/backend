@@ -12,7 +12,6 @@ class ReviewInput(BaseModel):
     
 class ReviewOutput( ReviewInput ):
     id: str
-    account_display_name: str
     created: datetime.datetime
     updated: datetime.datetime
     

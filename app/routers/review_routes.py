@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from typing import List
 from utils import validate_float_input, validate_input, validate_integer_input
-from database.reviews import create_review, delete_one_review, get_account_review, get_all_account_reviews, get_all_reviews, get_all_reviews_for_room, get_review_by_review_id, put_review
+from database.reviews import create_review, delete_one_review, get_account_review, get_all_account_reviews, get_all_reviews, get_all_reviews_for_room, get_review_by_id, put_review
 from models.response import ReviewInput, ReviewOutput, ReviewResponse, ReviewScoreResponse
 from exceptions.exceptions import ErrorResponse, RoomsNotFoundException
 from routers.account import User, get_current_user
@@ -36,7 +36,7 @@ async def get_my_review_for_room(room_name: str, current_user: User = Depends(ge
 
 @private_router.get("/my-reviews", response_model=List[ReviewOutput])
 async def get_my_reviews(current_user: User = Depends(get_current_user)):
-    reviews = get_all_reviews_for_room(current_user.id)
+    reviews = get_all_account_reviews(current_user.id)
     return reviews
 
 @private_router.post("/create-review", response_model=ReviewResponse)
@@ -44,12 +44,14 @@ async def leave_review(review: ReviewInput, current_user: User = Depends(get_cur
     create_review( current_user.id, review.room_name, review.review_score, review.review_text )
     return {"message": "Review successfully submitted"}
 
-@private_router.delete("/delete-review/{review_id}", response_model=ReviewResponse)
-async def delete_my_review(review_id: str, current_user: User = Depends(get_current_user)):
-    delete_one_review(review_id)
+@private_router.delete("/delete-review/{id}", response_model=ReviewResponse)
+async def delete_my_review(id: str, current_user: User = Depends(get_current_user)):
+    validate_input(id)
+    delete_one_review(id)
     return {"message": "Review successfully deleted"}
 
-@private_router.put("/update-review/{review_id}", response_model=ReviewResponse)
-async def update_my_review(review_id: str, review_score: int | float, review_text: str, current_user: User = Depends(get_current_user)):
-    put_review(review_id, review_score, review_text)
+@private_router.put("/update-review/{id}", response_model=ReviewResponse)
+async def update_my_review(id: str, review_score: int | float, review_text: str):
+    validate_input(id)
+    put_review(id, review_score, review_text)
     return {"message": "Review successfully updated"}
