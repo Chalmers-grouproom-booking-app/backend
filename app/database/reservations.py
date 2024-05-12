@@ -1,4 +1,4 @@
-from app.models.response import RoomModelV2
+from models.response import RoomModelV2
 from database.pb import client
 from enum import Enum
 import datetime
@@ -8,11 +8,9 @@ class RoomStatus(Enum):
     OCCUPIED = "occupied"
     SOON_OCCUPIED = "soon_occupied" # Room will be occupied in the next 30 minutes
 
-def check_room_status(room_id, now, in_30_minutes):
+def check_room_status(room_id, now, in_30_minutes, reservations):
     status = RoomStatus.AVAILABLE
     smallest_time_diff = float('inf')
-
-    reservations = get_current_reservations()
 
     for reservation in reservations:
         if reservation.room != room_id:
@@ -61,7 +59,9 @@ def convert_room_to_dict( room , status, time_diff) -> RoomModelV2:
     }
     return RoomModelV2(**data)
     
-def update_room_statuses(data):
+def update_room_statuses(data, status_filter: RoomStatus = None):
+    reservations = get_current_reservations()
+
     now = datetime.datetime.now()
     in_30_minutes = (now + datetime.timedelta(minutes=30)) 
     fields = {}
@@ -70,7 +70,9 @@ def update_room_statuses(data):
         rooms = []
         for room in data[key]:
             room_id = room.id
-            status, time_diff = check_room_status(room_id, now, in_30_minutes)
+            status, time_diff = check_room_status(room_id, now, in_30_minutes, reservations)
+            if (status_filter != None and status != status_filter.value):
+                continue
             room = convert_room_to_dict(room, status, time_diff)
             rooms.append(room)
     
@@ -86,5 +88,4 @@ def get_current_reservations():
         400,
         {'filter': f'(startdate~"{now_today}" && endtime>"{now_hour}" && starttime<"{now_hour}") || (startdate~"{now_today}" && starttime>="{now_hour}" && starttime<="{in_30_minutes}")'}
     )
-    print(reservations)
     return reservations

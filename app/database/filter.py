@@ -2,7 +2,7 @@ from exceptions.exceptions import RoomsNotFoundException
 from models.response import RoomModel, RoomDetails
 from database.pb import client
 from database.rooms import room_format
-from database.reservations import get_current_reservations, update_room_statuses
+from database.reservations import RoomStatus, get_current_reservations, update_room_statuses
 UNWANTED_FIELDS = ['expand', 'collection_id', 'collection_name', 'id', 'room_id', 'created', 'updated', 'longitude', 'latitude','entrance_longitude', 'entrance_latitude', 'description', 'stair']
 
 def get_fields(records):
@@ -40,12 +40,12 @@ def search_filter(search_result : str, filter : dict = {}):
     return formatted_data
 
 
-def search_filter_V2(search_result : str, filter : dict = {}):
+def search_filter_V2(search_result : str, filter : dict = {}, status: RoomStatus = None):
     data = {}
     filter_result = filter_results(filter)
     empty_counter = 1
-    total_fields = len(RoomDetails.__fields__.keys()) - len(UNWANTED_FIELDS)
-    for field in RoomModel.__fields__.keys():
+    total_fields = len(RoomDetails.model_fields.keys()) - len(UNWANTED_FIELDS)
+    for field in RoomModel.model_fields.keys():
         if field not in UNWANTED_FIELDS:
             records = client.collection('grouprooms').get_list(query_params={'filter': f'{field}~"{search_result}"' + filter_result})
             if len(records.items) == 0:
@@ -53,7 +53,7 @@ def search_filter_V2(search_result : str, filter : dict = {}):
             data.update({field : records.items})
     if empty_counter == total_fields:
         raise RoomsNotFoundException(f"No rooms found with the search term '{search_result}'")
-    rooms_with_status = update_room_statuses(data)
+    rooms_with_status = update_room_statuses(data, status)
     return rooms_with_status
 
 def filter_results(filters: dict):

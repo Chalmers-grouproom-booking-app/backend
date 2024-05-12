@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, Query
 from typing import Optional
+from database.reservations import RoomStatus
 from database.filter import search_filter, search_filter_V2
 from models.response import SearchModel, SearchModelV2
 from exceptions.exceptions import ErrorResponse
@@ -8,6 +9,7 @@ from exceptions.exceptions import ErrorResponse, RoomsNotFoundException
 
 router = APIRouter(prefix="/api/v2", tags=["Room API V2"])
 
+# RoomStatus Enum
 @router.get("/search", response_model=SearchModelV2, summary="Get search filtered results from database", responses={404: {"model": ErrorResponse, "description": "No results found"}})
 async def search_db(
     search_input: str = Depends(validate_input),
@@ -17,13 +19,14 @@ async def search_db(
     equipment: Optional[str] = Query("", description="Filter by available equipment"),
     room_name: Optional[str] = Query("", description="Filter by room name"),
     first_come_first_served: Optional[str] = Query("", description="Filter by first come first served status"),
-    floor_level: Optional[str] = Query("", description="Filter by floor level")
+    floor_level: Optional[str] = Query("", description="Filter by floor level"),
+    status: Optional[RoomStatus] =  Query(None, description="Filter by room status", enum=['available', 'occupied', 'soon_occupied'])
 ):
-    filters = {k: v for k, v in locals().items() if v is not None and k != "search_input"}
+    filters = {k: v for k, v in locals().items() if v is not None and (k != "search_input" and k != "status")}
     for key, value in filters.items():
         if value is not None:
             validate_input(value)  # Apply validation to each filter
-    results = search_filter_V2(search_input, filters)
+    results = search_filter_V2(search_input, filters, status)
     if not results:
         raise RoomsNotFoundException()
     return results
