@@ -64,6 +64,11 @@ class RoomModel(BaseModel):
     first_come_first_served: bool
     floor_level: Optional[int] 
     stair: Optional[str] 
+    
+class RoomModelV2( RoomModel ):
+    status: str
+    time_left: int
+    
 
 class ReservationModel(BaseModel):
     start_date: str
@@ -83,6 +88,14 @@ class SearchModel(BaseModel):
     room_size: Optional[  List[ RoomModel ] ] 
     floor_level: Optional[  List[ RoomModel ] ] 
     first_come_first_served: Optional[  List[ RoomModel ] ] 
+    
+
+class SearchModelV2(BaseModel):
+    building: Optional[ List[ RoomModelV2] ] 
+    room_name: Optional[ List[ RoomModelV2 ] ] 
+    room_size: Optional[  List[ RoomModelV2 ] ] 
+    floor_level: Optional[  List[ RoomModelV2 ] ] 
+    first_come_first_served: Optional[  List[ RoomModelV2 ] ] 
     
     
 class Account(BaseModel):
