@@ -13,7 +13,7 @@ def get_all_rooms():
     all_rooms = RoomQuery.get_all_rooms()
     return format_all_rooms(  all_rooms )
 
-def format_all_rooms( room_records: list ) -> list[RoomModel]:
+def format_all_rooms( room_records: list ) -> List[RoomModel]:
     return [ convert_room_to_dict(room) for room in room_records ]
 
 def get_room_id(room_name: str) -> int:
@@ -125,6 +125,9 @@ def __compare_reservation_times(reservation, interval_forward_hours):
 
 
 def get_building_booked_percentage(building_name: str, interval_forward_hours: float) -> float:
+    if(not _building_contains_bookable_rooms):
+        return -1
+    
     # Get all rooms of a building
     rooms = BuildingQuery(building_name).get_all_rooms_in_building()
     
@@ -141,3 +144,16 @@ def get_building_booked_percentage(building_name: str, interval_forward_hours: f
     # Loop over all rooms in a building
     percentage: float = booked_rooms / max(filtered_rooms, 1)
     return percentage
+
+def get_all_building_booked_percentages() -> List[float]:
+    buildings = BuildingQuery("Kårhuset").get_all_buildings()
+
+    for building in buildings:
+        rooms = BuildingQuery(building).get_all_rooms_in_building()
+
+
+def _building_contains_bookable_rooms(building_name) -> bool:
+    rooms = BuildingQuery(building_name).get_all_rooms_in_building()
+    if(len(rooms) == 0):
+        return True
+    return False
