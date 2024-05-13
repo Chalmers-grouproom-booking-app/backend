@@ -130,13 +130,13 @@ def get_building_booked_percentage(building_name: str, interval_forward_hours: f
     
     # Get all rooms of a building
     rooms = BuildingQuery(building_name).get_all_rooms_in_building()
-    
+
     # Filter out first come first serve rooms
     filtered_rooms: int = 0
     booked_rooms: int = 0
-    
+
     for r in rooms:
-        if(not r.first_come_first_served):
+        if(r.first_come_first_served):
             filtered_rooms += 1
             if(is_room_booked(r.room_name, interval_forward_hours)):
                 booked_rooms += 1
@@ -144,12 +144,6 @@ def get_building_booked_percentage(building_name: str, interval_forward_hours: f
     # Loop over all rooms in a building
     percentage: float = booked_rooms / max(filtered_rooms, 1)
     return percentage
-
-def get_all_building_booked_percentages() -> List[float]:
-    buildings = BuildingQuery("Kårhuset").get_all_buildings()
-
-    for building in buildings:
-        rooms = BuildingQuery(building).get_all_rooms_in_building()
 
 
 def _building_contains_bookable_rooms(building_name) -> bool:
