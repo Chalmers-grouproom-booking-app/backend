@@ -15,6 +15,7 @@ from routers import room_routes
 from routers import timeedit_routes
 from routers import account
 from routers import room_routes_v2
+from routers import room_routes_v3
 origins = []
 
 scheduler = BackgroundScheduler()
@@ -23,6 +24,7 @@ test_encryption_key()
 
 app.include_router(room_routes.router)
 app.include_router(room_routes_v2.router)
+app.include_router(room_routes_v3.router)
 app.include_router(review_routes.public_router)
 app.include_router(review_routes.private_router)
 app.include_router(timeedit_routes.router)
