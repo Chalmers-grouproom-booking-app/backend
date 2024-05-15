@@ -136,7 +136,7 @@ def get_building_booked_percentage(building_name: str, interval_forward_hours: f
     booked_rooms: int = 0
 
     for r in rooms:
-        if(r.first_come_first_served):
+        if(not r.first_come_first_served):
             filtered_rooms += 1
             if(is_room_booked(r.room_name, interval_forward_hours)):
                 booked_rooms += 1
