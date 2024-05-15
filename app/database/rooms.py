@@ -125,7 +125,7 @@ def __compare_reservation_times(reservation, interval_forward_hours):
 
 
 def get_building_booked_percentage(building_name: str, interval_forward_hours: float) -> float:
-    if(not _building_contains_bookable_rooms):
+    if(not _building_contains_rooms):
         return -1
     
     # Get all rooms of a building
@@ -146,8 +146,8 @@ def get_building_booked_percentage(building_name: str, interval_forward_hours: f
     return percentage
 
 
-def _building_contains_bookable_rooms(building_name) -> bool:
+def _building_contains_rooms(building_name) -> bool:
     rooms = BuildingQuery(building_name).get_all_rooms_in_building()
-    if(len(rooms) == 0):
+    if(len(rooms) != 0):
         return True
     return False
