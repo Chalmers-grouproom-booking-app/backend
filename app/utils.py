@@ -11,6 +11,7 @@ if not key:
     raise ValueError("ENCRYPTION_KEY is not set in the environment variables.")
 cipher = Fernet(key)
 
+MAX_LENGTH = 50
 
 def encrypt_data(data: str) -> str:
     """Encrypt data."""
@@ -37,7 +38,7 @@ def format_cid_username(username):
     else:
         return None
 
-MAX_LENGTH = 50
+
 def validate_input(input: str) -> str:
     if input == '':
         return input

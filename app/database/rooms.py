@@ -131,20 +131,43 @@ def get_building_booked_percentage(building_name: str, interval_forward_hours: f
     # Get all rooms of a building
     rooms = BuildingQuery(building_name).get_all_rooms_in_building()
 
+    # reservations
+    reservations = BuildingQuery(building_name).get_building_reservations(interval_forward_hours)
+
     # Filter out first come first serve rooms
-    filtered_rooms: int = 0
-    booked_rooms: int = 0
+    all_rooms: int = len(rooms)
+    booked_rooms: int = len(reservations)
 
-    for r in rooms:
-        if(not r.first_come_first_served):
-            filtered_rooms += 1
-            if(is_room_booked(r.room_name, interval_forward_hours)):
-                booked_rooms += 1
-
-    # Loop over all rooms in a building
-    percentage: float = booked_rooms / max(filtered_rooms, 1)
+    percentage: float = booked_rooms / all_rooms
     return percentage
 
+def get_all_buildings_booked_percentage(interval_forward_hours: float) -> List[SearchModel]:
+
+    building_records = {
+        "Kårhuset": -1,
+        "Fysik": -1,
+        "Kemi": -1, 
+        "M-huset": -1, 
+        "Biblioteket": -1,
+        "EDIT trappa A och B": -1,
+        "EDIT trappa C, D och H": -1,
+        "Samhällsbyggnad I-II": -1,
+        "Samhällsbyggnad III": -1,
+        "Vasa Hus 1": -1,
+        "Vasa Hus 2": -1,
+        "Vasa Hus 3": -1,
+        "Svea": -1,
+        "Jupiter": -1,
+        "Kuggen": -1
+    }
+    
+    for key in building_records:
+        building_records[key] = get_building_booked_percentage(key, interval_forward_hours)
+            
+    return building_records
+
+
+    
 
 def _building_contains_rooms(building_name) -> bool:
     rooms = BuildingQuery(building_name).get_all_rooms_in_building()

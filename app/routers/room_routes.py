@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Query
 from typing import List, Optional
 from database.filter import search_filter
-from database.rooms import get_all_rooms, get_room_info, show_room_reservations, show_all_reservations, is_room_booked, get_building_booked_percentage, get_room_id
+from database.rooms import get_all_rooms, get_room_info, show_room_reservations, show_all_reservations, is_room_booked, get_building_booked_percentage, get_room_id, get_all_buildings_booked_percentage
 from models.response import ReservationModel, RoomModel, SearchModel, BookedModel, BuildingModel, RoomId
 from exceptions.exceptions import ErrorResponse
 from utils import validate_input
@@ -68,9 +68,9 @@ async def get_reservation(room_name: str = Depends(validate_input)):
 @router.get("/room/booked", response_model=List[BookedModel], summary="Get room booked status", responses={404: {"model": ErrorResponse, "description": "No room found"}})
 async def get_room_booked(
     room_name: str = Depends(validate_input), 
-    interval_forward_hours: float = Query(0.5, description="Hours forward interval")
+    interval_forward_minutes: float = Query(30, description="Minutes forward interval")
 ):
-    booked = [{"booked": is_room_booked(room_name, interval_forward_hours)}]
+    booked = [{"booked": is_room_booked(room_name, interval_forward_minutes)}]
     if booked == None:
         raise RoomNotFoundException('No booking found')
     return booked
@@ -78,11 +78,20 @@ async def get_room_booked(
 @router.get("/building/percentage", response_model=float, summary="Get building booked percentage", responses={404: {"model": ErrorResponse, "description": "No building found"}})
 async def get_building_percentage(
     building_name: str = Depends(validate_input), 
-    interval_forward_hours: float = Query(0.5, description="Hours forward interval")
+    interval_forward_minutes: float = Query(30, description="Minutes forward interval")
 ):
-    
-    percentage = get_building_booked_percentage(building_name, interval_forward_hours)
+    percentage = get_building_booked_percentage(building_name, interval_forward_minutes)
 
     if percentage == None:
         raise RoomNotFoundException('No building found')
     return percentage
+
+@router.get("buildings/percentage/all", response_model=dict, summary="Get all building booked percentages", responses={404: {"model": ErrorResponse, "description": "No buildings found"}})
+async def get_all_building_percentages(
+    interval_forward_minutes: float = Query(30, description="Minutes forward interval")
+):
+    building_percentages = get_all_buildings_booked_percentage(interval_forward_minutes)
+
+    if building_percentages == None:
+        raise RoomNotFoundException('No buildings found')
+    return building_percentages
