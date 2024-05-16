@@ -113,11 +113,5 @@ async def get_all_bookable_building_percentage(
     #df.groupby(buildings)
     #print(df["Fysik"])
     print(df.sum(axis=1))
-    
-
-    
-
-    
-
 
     return df.to_numpy()
