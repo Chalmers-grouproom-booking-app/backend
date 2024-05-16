@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends, Query
 from typing import List, Optional
 from database.filter import search_filter
-from database.rooms import get_all_rooms, get_room_info, show_room_reservations, show_all_reservations, is_room_booked, get_building_booked_percentage, get_room_id
+from database.rooms import get_all_rooms, get_room_info, show_room_reservations, show_all_reservations, is_room_booked, get_building_booked_percentage, get_room_id, get_all_bookable_buildings
 from models.response import ReservationModel, RoomModel, SearchModel, BookedModel, BuildingModel, RoomId
 from exceptions.exceptions import ErrorResponse
 from utils import validate_input
 from exceptions.exceptions import ErrorResponse, RoomsNotFoundException, RoomNotFoundException, ReservationsNotFoundException
+import pandas as pd
 
 router = APIRouter(prefix="/api/v1", tags=["Room API"])
 
@@ -80,9 +81,43 @@ async def get_building_percentage(
     building_name: str = Depends(validate_input), 
     interval_forward_hours: float = Query(0.5, description="Hours forward interval")
 ):
-    
     percentage = get_building_booked_percentage(building_name, interval_forward_hours)
 
     if percentage == None:
         raise RoomNotFoundException('No building found')
     return percentage
+
+@router.get("/building/bookable/percentage", response_model=List[dict], summary="Get all bookable building booked percentage", responses={404: {"model": ErrorResponse, "description": "No buildings found"}})
+async def get_all_bookable_building_percentage(
+    interval_forward_hours: float = Query(0.5, description="Hours forward interval")
+):
+    #buildings = get_all_bookable_buildings()
+
+    buildings = ["Kårhuset", "Fysik", "Kemi", "M-huset", "Biblioteket", "EDIT trappa A och B", "EDIT trappa C, D och H", "Samhällsbyggnad I-II", "Samhällsbyggnad III", "Vasa Hus 1", "Vasa Hus 2", "Vasa Hus 3", "Svea", "Jupiter", "Kuggen"]
+
+    booked_rooms = []
+    #for building in buildings:
+    #    percentages.append({building: get_building_booked_percentage(building, interval_forward_hours)})
+    
+    #if len(percentages) <= 0:
+    #    raise RoomsNotFoundException("No buildings found")
+
+    all_rooms = get_all_rooms()
+    for room in all_rooms:
+        if(room["building"] in buildings):
+            #print(is_room_booked(room["room_name"], interval_forward_hours))
+            booked_rooms.append({room["building"]: int(is_room_booked(room["room_name"], interval_forward_hours) == True)})
+            
+    df = pd.DataFrame(booked_rooms)
+    #df.columns = buildings
+    #df.groupby(buildings)
+    #print(df["Fysik"])
+    print(df.sum(axis=1))
+    
+
+    
+
+    
+
+
+    return df.to_numpy()

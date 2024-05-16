@@ -151,3 +151,7 @@ def _building_contains_bookable_rooms(building_name) -> bool:
     if(len(rooms) == 0):
         return True
     return False
+
+def get_all_bookable_buildings():
+    buildings = BuildingQuery("Irrelevant").get_all_buildings()
+    return buildings

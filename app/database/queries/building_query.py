@@ -15,13 +15,19 @@ class BuildingQuery:
         if not rooms:
             raise RoomNotFoundException(f"No building found called '{self.building}'")
         return rooms
+    
 
     def get_all_buildings(self):
         """Return all buildings"""
-        data = client.collection("grouprooms").get_full_list()
-        print(pd.DataFrame(data))
-        buildings = []
-        for entry in data:
-            if (entry.building not in buildings):
-                buildings.append(entry.building)
-        return buildings
+        df = pd.DataFrame(client.collection('grouprooms').get_list(1, 310).items)
+        df.columns = ["record"]
+
+        df = df['record'].apply(_get_building_name_from_record_item)
+        #buildings = []
+        #for entry in record:
+        #    if (entry.building not in buildings):
+        #        buildings.append(entry.building)
+        return df.unique()
+
+def _get_building_name_from_record_item(record_item):
+    return record_item.building
