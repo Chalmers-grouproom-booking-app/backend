@@ -86,7 +86,7 @@ async def get_building_percentage(
         raise RoomNotFoundException('No building found')
     return percentage
 
-@router.get("buildings/percentage/all", response_model=dict, summary="Get all building booked percentages", responses={404: {"model": ErrorResponse, "description": "No buildings found"}})
+@router.get("/building/percentage/all", response_model=dict, summary="Get all building booked percentages", responses={404: {"model": ErrorResponse, "description": "No buildings found"}})
 async def get_all_building_percentages(
     interval_forward_minutes: float = Query(30, description="Minutes forward interval")
 ):
