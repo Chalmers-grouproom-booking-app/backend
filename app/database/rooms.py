@@ -149,13 +149,7 @@ def get_all_buildings_booked_percentage(interval_forward_hours: float) -> List[S
         "Kemi": -1, 
         "M-huset": -1, 
         "Biblioteket": -1,
-        "EDIT trappa A och B": -1,
-        "EDIT trappa C, D och H": -1,
-        "Samhällsbyggnad I-II": -1,
-        "Samhällsbyggnad III": -1,
         "Vasa Hus 1": -1,
-        "Vasa Hus 2": -1,
-        "Vasa Hus 3": -1,
         "Svea": -1,
         "Jupiter": -1,
         "Kuggen": -1
