@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from utils import test_encryption_key
 import os
 import uvicorn
-
+from fastapi.staticfiles import StaticFiles
 load_dotenv()
 
 from routers import review_routes
@@ -29,7 +29,7 @@ app.include_router(review_routes.public_router)
 app.include_router(review_routes.private_router)
 app.include_router(timeedit_routes.router)
 app.include_router(account.router)
-
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -43,7 +43,12 @@ def index():
     html_path = os.path.join(file_path, "templates", "index.html")
     html_content = open(html_path, "r", encoding="utf-8").read()
     return HTMLResponse(content=html_content, status_code=status.HTTP_200_OK)
-
+@app.get("/demo", response_class=HTMLResponse)
+def demo():
+    file_path = os.path.dirname(os.path.realpath(__file__))
+    html_path = os.path.join(file_path, "templates", "demo.html")
+    html_content = open(html_path, "r", encoding="utf-8").read()
+    return HTMLResponse(content=html_content, status_code=status.HTTP_200_OK)
 @app.get("/ping", status_code=status.HTTP_200_OK, tags=["API Check"], summary="Check if the API is up")
 def check():
     return {"message": "pong"}
