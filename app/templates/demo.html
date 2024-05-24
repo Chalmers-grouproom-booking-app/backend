@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Video Player</title>
+    <meta property="og:title" content="Demo Video">
+    <meta property="og:description" content="Watch this amazing demo video.">
+    <meta property="og:image" content="https://media1.tenor.com/m/BAzma6OlbvAAAAAd/dancing-toothless-tothless.gif">
+    <meta property="og:url" content="https://strawhats.info/demo">
+    <meta property="og:type" content="video.other">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -55,22 +60,10 @@
 <body>
     <div class="video-container">
         <h1>Demo Video</h1>
-        <video controls preload="none" loading="lazy">
+        <video id="video" controls preload="none" loading="lazy" autoplay muted>
             <source src="/static/demo.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
     </div>
-    <script>
-        const video = document.getElementById('video');
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const source = audioContext.createMediaElementSource(video);
-        const gainNode = audioContext.createGain();
-
-        // Set the gain value to increase volume
-        gainNode.gain.value = 2; // Increase this value to make it louder
-
-        source.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-    </script>
 </body>
 </html>
