@@ -10,19 +10,23 @@ This backend is tailored for our Group Room Booking App, powered by a FastAPI se
 - **Scalability**: Designed to handle increasing loads with efficient request handling and data management.
 
 ## Installation
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/your-repository-url.git
-   cd your-repository-directory
-   ```
-2. **Install the requirements**:
-  ```bash
+
+1. **Clone the repository:**
+    ```bash
+    git clone https://github.com/your-repository-url.git
+    cd your-repository-directory
+    ```
+
+2. **Install the requirements:**
+    ```bash
     pip install -r requirements.txt
-  ```
-3. **Run the server**:
-  ```bash
-  python -m uvicorn --app-dir="./app" --reload main:app --reload
-  ```
+    ```
+
+3. **Run the server:**
+    ```bash
+    python -m uvicorn --app-dir="./app" --reload main:app --reload
+    ```
+
 
 ## Configuration
 Ensure the following configurations are set up before running the server:
