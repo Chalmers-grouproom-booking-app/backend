@@ -1,4 +1,4 @@
-# Group Room Booking App - Python FastAPI Backend
+# Group Room Booking App
 
 ## Description
 This backend is tailored for our Group Room Booking App, powered by a FastAPI server. It facilitates room booking functionalities by serving data from various sources, including web scraping and Pocketbase, to provide real-time room availability and booking management.
